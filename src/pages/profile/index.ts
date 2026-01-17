@@ -3,7 +3,7 @@ import '../../styles/main.scss';
 import { Avatar } from '../../components/avatar';
 
 const template = `
-<div class="profile">
+<main class="profile">
   <aside class="profile__sidebar">
     <a href="/index.html" class="profile__back">←</a>
   </aside>
@@ -20,13 +20,13 @@ const template = `
       </div>
       {{/each}}
     </div>
-    <div class="profile__actions">
+    <nav class="profile__actions">
       <a href="/profile-edit.html" class="profile__link">Edit profile</a>
       <a href="/profile-password.html" class="profile__link">Change password</a>
       <a href="/login.html" class="profile__link profile__link--danger">Log out</a>
-    </div>
+    </nav>
   </div>
-</div>
+</main>
 `;
 
 function ProfilePage(): string {

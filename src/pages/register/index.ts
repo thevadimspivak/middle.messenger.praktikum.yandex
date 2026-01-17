@@ -4,7 +4,7 @@ import { Input } from '../../components/input';
 import { Button } from '../../components/button';
 
 const template = `
-<div class="page">
+<main class="page">
   <div class="card">
     <h1 class="card__title">Registration</h1>
     <form class="form">
@@ -20,7 +20,7 @@ const template = `
       </div>
     </form>
   </div>
-</div>
+</main>
 `;
 
 function RegisterPage(): string {
