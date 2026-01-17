@@ -2,7 +2,7 @@ import Handlebars from 'handlebars';
 import '../../styles/main.scss';
 
 const template = `
-<div class="chat">
+<main class="chat">
   <aside class="chat__sidebar">
     <div class="chat__header">
       <a href="/profile.html" class="chat__profile-link">Profile →</a>
@@ -28,12 +28,12 @@ const template = `
       {{/each}}
     </ul>
   </aside>
-  <main class="chat__main">
+  <div class="chat__main">
     <div class="chat__empty">
       <p>Select a chat to start messaging</p>
     </div>
-  </main>
-</div>
+  </div>
+</main>
 `;
 
 function ChatPage(): string {

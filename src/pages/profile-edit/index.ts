@@ -5,7 +5,7 @@ import { Input } from '../../components/input';
 import { Button } from '../../components/button';
 
 const template = `
-<div class="profile">
+<main class="profile">
   <aside class="profile__sidebar">
     <a href="/profile.html" class="profile__back">←</a>
   </aside>
@@ -24,7 +24,7 @@ const template = `
       </div>
     </form>
   </div>
-</div>
+</main>
 `;
 
 function ProfileEditPage(): string {
