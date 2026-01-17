@@ -1,0 +1,45 @@
+@use 'variables' as *;
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 32px;
+  font-size: 14px;
+  font-family: inherit;
+  font-weight: 500;
+  border: none;
+  border-radius: $border-radius-small;
+  cursor: pointer;
+  transition: background-color 0.2s, opacity 0.2s;
+  width: 100%;
+
+  &--primary {
+    background-color: $color-primary;
+    color: #ffffff;
+
+    &:hover {
+      background-color: $color-primary-hover;
+    }
+  }
+
+  &--link {
+    background: none;
+    color: $color-link;
+    padding: 8px;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+
+  &--danger {
+    background: none;
+    color: $color-danger;
+    padding: 8px;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+}
