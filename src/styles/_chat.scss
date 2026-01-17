@@ -1,0 +1,256 @@
+@use 'variables' as *;
+
+.chat {
+  display: flex;
+  height: 100vh;
+
+  &__sidebar {
+    width: 320px;
+    background: $color-white;
+    border-right: 1px solid $color-border;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__header {
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid $color-border;
+  }
+
+  &__profile-link {
+    font-size: 13px;
+    color: $color-text-secondary;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    &:hover {
+      color: $color-primary;
+    }
+  }
+
+  &__search {
+    padding: 12px 16px;
+    border-bottom: 1px solid $color-border;
+  }
+
+  &__search-input {
+    width: 100%;
+    padding: 10px 16px;
+    background: $color-background;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    color: $color-text;
+    outline: none;
+
+    &::placeholder {
+      color: $color-text-secondary;
+    }
+  }
+
+  &__list {
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    gap: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border-bottom: 1px solid $color-border;
+
+    &:hover {
+      background: $color-background;
+    }
+
+    &--active {
+      background: #2a3a4a;
+
+      &:hover {
+        background: #354555;
+      }
+    }
+  }
+
+  &__item-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__item-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+
+  &__item-name {
+    font-weight: 600;
+    font-size: 13px;
+  }
+
+  &__item-time {
+    font-size: 11px;
+    color: $color-text-secondary;
+  }
+
+  &__item-message {
+    font-size: 13px;
+    color: $color-text-secondary;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__item-badge {
+    width: 20px;
+    height: 20px;
+    background: $color-primary;
+    color: $color-white;
+    font-size: 11px;
+    font-weight: 500;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: $color-background;
+  }
+
+  &__empty {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $color-text-secondary;
+    font-size: 14px;
+  }
+
+  &__conversation-header {
+    padding: 12px 20px;
+    background: $color-white;
+    border-bottom: 1px solid $color-border;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__conversation-name {
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  &__messages {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  &__message-date {
+    text-align: center;
+    font-size: 12px;
+    color: $color-text-secondary;
+    margin: 16px 0;
+  }
+
+  &__message {
+    max-width: 60%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 14px;
+    line-height: 1.4;
+
+    &--incoming {
+      background: $color-white;
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+    }
+
+    &--outgoing {
+      background: #2a4a6a;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+  }
+
+  &__message-time {
+    font-size: 11px;
+    color: $color-text-secondary;
+    margin-top: 4px;
+    text-align: right;
+  }
+
+  &__input-area {
+    padding: 16px 20px;
+    background: $color-white;
+    border-top: 1px solid $color-border;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__attach {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: $color-text-secondary;
+    transition: color 0.2s;
+
+    &:hover {
+      color: $color-primary;
+    }
+  }
+
+  &__input {
+    flex: 1;
+    padding: 10px 16px;
+    background: $color-background;
+    border: none;
+    border-radius: 20px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+
+    &::placeholder {
+      color: $color-text-secondary;
+    }
+  }
+
+  &__send {
+    width: 36px;
+    height: 36px;
+    background: $color-primary;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $color-white;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background: $color-primary-hover;
+    }
+  }
+}
