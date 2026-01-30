@@ -36,6 +36,10 @@
   &::placeholder {
     color: $color-text-secondary;
   }
+
+  &--error {
+    border-color: $color-error;
+  }
 }
 
 .form__error {

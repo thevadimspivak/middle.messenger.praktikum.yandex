@@ -1,8 +1,7 @@
 import Handlebars from 'handlebars';
 import '../../styles/main.scss';
-import { Avatar } from '../../components/avatar';
-import { Input } from '../../components/input';
-import { Button } from '../../components/button';
+import { Avatar, Input, Button, PhoneInput, setupPhoneMask } from '../../components';
+import { getFormValues, setupFormValidation } from '../../utils';
 
 const template = `
 <main class="profile">
@@ -29,42 +28,41 @@ const template = `
 
 function ProfileEditPage(): string {
   return Handlebars.compile(template)({
-    avatar: Avatar(),
-    emailInput: Input({
+    avatar: new Avatar().getContent()?.outerHTML || '',
+    emailInput: new Input({
       name: 'email',
       label: 'Email',
       type: 'email',
       value: 'ivan@mail.com',
-    }),
-    loginInput: Input({
+    }).getContent()?.outerHTML || '',
+    loginInput: new Input({
       name: 'login',
       label: 'Login',
       type: 'text',
       value: 'ivanivanov',
-    }),
-    firstNameInput: Input({
+    }).getContent()?.outerHTML || '',
+    firstNameInput: new Input({
       name: 'first_name',
       label: 'First name',
       type: 'text',
       value: 'Ivan',
-    }),
-    secondNameInput: Input({
+    }).getContent()?.outerHTML || '',
+    secondNameInput: new Input({
       name: 'second_name',
       label: 'Last name',
       type: 'text',
       value: 'Ivanov',
-    }),
-    phoneInput: Input({
+    }).getContent()?.outerHTML || '',
+    phoneInput: new PhoneInput({
       name: 'phone',
       label: 'Phone',
-      type: 'tel',
       value: '+7 (999) 999-99-99',
-    }),
-    submitButton: Button({
+    }).getContent()?.outerHTML || '',
+    submitButton: new Button({
       type: 'primary',
       buttonType: 'submit',
       text: 'Save',
-    }),
+    }).getContent()?.outerHTML || '',
   });
 }
 
@@ -72,5 +70,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const app = document.getElementById('app');
   if (app) {
     app.innerHTML = ProfileEditPage();
+
+    const form = app.querySelector('.profile-form') as HTMLFormElement;
+    if (form) {
+      setupFormValidation(form);
+      
+      const phoneInput = form.querySelector('[name="phone"]') as HTMLInputElement;
+      if (phoneInput) {
+        setupPhoneMask(phoneInput);
+      }
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const formData = getFormValues(form);
+        console.log('Profile edit form data:', formData);
+      });
+    }
   }
 });

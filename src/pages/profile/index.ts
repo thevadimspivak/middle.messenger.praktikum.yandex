@@ -1,6 +1,6 @@
 import Handlebars from 'handlebars';
 import '../../styles/main.scss';
-import { Avatar } from '../../components/avatar';
+import { Avatar } from '../../components';
 
 const template = `
 <main class="profile">
@@ -39,7 +39,7 @@ function ProfilePage(): string {
   ];
 
   return Handlebars.compile(template)({
-    avatar: Avatar(),
+    avatar: new Avatar().getContent()?.outerHTML || '',
     displayName: 'Ivan',
     fields,
   });

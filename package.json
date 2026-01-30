@@ -7,12 +7,23 @@
     "dev": "vite --port 3000",
     "build": "vite build",
     "start": "npm run build && npm run preview",
-    "preview": "vite preview --port 3000"
+    "preview": "vite preview --port 3000",
+    "lint": "npm run lint:ts && npm run lint:style && npm run lint:types",
+    "lint:ts": "eslint src/**/*.ts",
+    "lint:style": "stylelint src/**/*.scss",
+    "lint:types": "tsc --noEmit"
   },
   "devDependencies": {
     "@types/node": "^25.0.9",
+    "@typescript-eslint/eslint-plugin": "^8.53.1",
+    "@typescript-eslint/parser": "^8.53.1",
+    "eslint": "^8.57.1",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.32.0",
     "handlebars": "^4.7.8",
     "sass": "^1.69.5",
+    "stylelint": "^17.0.0",
+    "stylelint-config-standard-scss": "^17.0.0",
     "typescript": "^5.3.2",
     "vite": "^5.0.0"
   },
