@@ -1,7 +1,7 @@
 import Handlebars from 'handlebars';
 import '../../styles/main.scss';
-import { Input } from '../../components/input';
-import { Button } from '../../components/button';
+import { Input, Button } from '../../components';
+import { getFormValues, setupFormValidation } from '../../utils';
 
 const template = `
 <main class="page">
@@ -19,31 +19,57 @@ const template = `
 </main>
 `;
 
-function LoginPage(): string {
-  return Handlebars.compile(template)({
-    loginInput: Input({
+class LoginPage {
+  private loginInput: Input;
+  private passwordInput: Input;
+  private submitButton: Button;
+
+  constructor() {
+    this.loginInput = new Input({
       name: 'login',
       label: 'Login',
       type: 'text',
       placeholder: 'Enter your login',
-    }),
-    passwordInput: Input({
+    });
+
+    this.passwordInput = new Input({
       name: 'password',
       label: 'Password',
       type: 'password',
       placeholder: 'Enter your password',
-    }),
-    submitButton: Button({
+    });
+
+    this.submitButton = new Button({
       type: 'primary',
       buttonType: 'submit',
       text: 'Sign in',
-    }),
-  });
+    });
+  }
+
+  render(): string {
+    return Handlebars.compile(template)({
+      loginInput: this.loginInput.getContent()?.outerHTML || '',
+      passwordInput: this.passwordInput.getContent()?.outerHTML || '',
+      submitButton: this.submitButton.getContent()?.outerHTML || '',
+    });
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
   const app = document.getElementById('app');
   if (app) {
-    app.innerHTML = LoginPage();
+    const loginPage = new LoginPage();
+    app.innerHTML = loginPage.render();
+
+    const form = app.querySelector('.form') as HTMLFormElement;
+    if (form) {
+      setupFormValidation(form);
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const formData = getFormValues(form);
+        console.log('Login form data:', formData);
+      });
+    }
   }
 });

@@ -56,3 +56,11 @@ npm run build
 ```bash
 npm run start
 ```
+
+## Проверка кода
+
+### Запуск всех линтеров
+
+```bash
+npm run lint
+```
