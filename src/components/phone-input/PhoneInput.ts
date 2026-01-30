@@ -47,8 +47,9 @@ export function setupPhoneMask(input: HTMLInputElement): void {
 
   input.addEventListener('input', handleInput);
 
-  if (!input.value) {
-    input.value = '+7';
+  const inputElement = input;
+  if (!inputElement.value) {
+    inputElement.value = '+7';
   }
 }
 

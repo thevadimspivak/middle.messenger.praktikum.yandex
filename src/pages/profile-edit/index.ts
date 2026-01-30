@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const form = app.querySelector('.profile-form') as HTMLFormElement;
     if (form) {
       setupFormValidation(form);
-      
+
       const phoneInput = form.querySelector('[name="phone"]') as HTMLInputElement;
       if (phoneInput) {
         setupPhoneMask(phoneInput);
