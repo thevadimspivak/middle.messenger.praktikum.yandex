@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const formData = getFormValues(form);
         console.log('Chat message form data:', formData);
-        
+
         form.reset();
       });
     }
