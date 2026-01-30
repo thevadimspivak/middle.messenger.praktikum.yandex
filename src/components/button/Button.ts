@@ -1,5 +1,5 @@
-import { Block } from '../../core';
 import Handlebars from 'handlebars';
+import { Block } from '../../core';
 import type { ButtonProps } from './types';
 
 const template = `

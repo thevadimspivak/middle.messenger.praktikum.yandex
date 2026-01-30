@@ -1,6 +1,8 @@
 import Handlebars from 'handlebars';
 import '../../styles/main.scss';
-import { Avatar, Input, Button, PhoneInput, setupPhoneMask } from '../../components';
+import {
+  Avatar, Input, Button, PhoneInput, setupPhoneMask,
+} from '../../components';
 import { getFormValues, setupFormValidation } from '../../utils';
 
 const template = `

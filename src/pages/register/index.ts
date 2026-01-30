@@ -1,6 +1,8 @@
 import Handlebars from 'handlebars';
 import '../../styles/main.scss';
-import { Input, Button, PhoneInput, setupPhoneMask } from '../../components';
+import {
+  Input, Button, PhoneInput, setupPhoneMask,
+} from '../../components';
 import { getFormValues, setupFormValidation } from '../../utils';
 
 const template = `
@@ -75,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const form = app.querySelector('.form') as HTMLFormElement;
     if (form) {
       setupFormValidation(form);
-      
+
       const phoneInput = form.querySelector('[name="phone"]') as HTMLInputElement;
       if (phoneInput) {
         setupPhoneMask(phoneInput);

@@ -21,7 +21,9 @@ const template = `
 
 class LoginPage {
   private loginInput: Input;
+
   private passwordInput: Input;
+
   private submitButton: Button;
 
   constructor() {

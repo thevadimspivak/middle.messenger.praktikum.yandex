@@ -64,8 +64,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const newPasswordInput = form.querySelector('[name="newPassword"]') as HTMLInputElement;
       const confirmPasswordInput = form.querySelector('[name="newPassword_confirm"]') as HTMLInputElement;
-      
-      [newPasswordInput, confirmPasswordInput].forEach(input => {
+
+      [newPasswordInput, confirmPasswordInput].forEach((input) => {
         input?.addEventListener('input', () => {
           const errorSpan = confirmPasswordInput?.parentElement?.querySelector('.form__error') as HTMLElement;
           if (errorSpan && errorSpan.textContent === 'Passwords do not match') {
@@ -77,14 +77,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
       form.addEventListener('submit', (event) => {
         event.preventDefault();
-        
+
         const formData = getFormValues(form);
-        
+
         const passwordMatchError = validatePasswordMatch(
           formData.newPassword,
-          formData.newPassword_confirm
+          formData.newPassword_confirm,
         );
-        
+
         if (passwordMatchError) {
           const errorSpan = confirmPasswordInput?.parentElement?.querySelector('.form__error') as HTMLElement;
           if (errorSpan) {
@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
           }
           return;
         }
-        
+
         console.log('Change password form data:', formData);
       });
     }
