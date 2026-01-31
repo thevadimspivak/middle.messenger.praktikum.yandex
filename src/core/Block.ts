@@ -3,6 +3,7 @@ import { EventBus } from './EventBus';
 export interface BlockProps {
   // any нужен для index signature, конкретные типы задаются в наследниках
   [key: string]: any;
+  events?: Record<string, (event: Event) => void>;
 }
 
 interface BlockChild {
@@ -74,7 +75,7 @@ export class Block<P extends BlockProps = BlockProps> {
 
   private _createResources(): void {
     const { tagName } = this._meta;
-    this._element = this._createDocumentElement(tagName);
+    this._element = document.createElement(tagName);
   }
 
   private _init(): void {
@@ -132,8 +133,49 @@ export class Block<P extends BlockProps = BlockProps> {
     const block = this.render();
 
     if (this._element) {
+      this._removeEvents();
       this._element.innerHTML = block;
+      this._addEvents();
     }
+  }
+
+  private _parseEventName(eventName: string): { event: string; selector: string } {
+    const [event, selector] = eventName.split(' ');
+    return { event, selector };
+  }
+
+  private _addEvents(): void {
+    const { events = {} } = this.props;
+
+    Object.keys(events).forEach((eventName) => {
+      const { event, selector } = this._parseEventName(eventName);
+
+      if (selector) {
+        const elements = this._element?.querySelectorAll(selector);
+        elements?.forEach((element) => {
+          element.addEventListener(event, events[eventName]);
+        });
+      } else {
+        this._element?.addEventListener(event, events[eventName]);
+      }
+    });
+  }
+
+  private _removeEvents(): void {
+    const { events = {} } = this.props;
+
+    Object.keys(events).forEach((eventName) => {
+      const { event, selector } = this._parseEventName(eventName);
+
+      if (selector) {
+        const elements = this._element?.querySelectorAll(selector);
+        elements?.forEach((element) => {
+          element.removeEventListener(event, events[eventName]);
+        });
+      } else {
+        this._element?.removeEventListener(event, events[eventName]);
+      }
+    });
   }
 
   protected render(): string {
@@ -164,10 +206,6 @@ export class Block<P extends BlockProps = BlockProps> {
     });
   }
 
-  private _createDocumentElement(tagName: string): HTMLElement {
-    return document.createElement(tagName);
-  }
-
   public show(): void {
     if (this._element) {
       this._element.style.display = 'block';
@@ -178,5 +216,28 @@ export class Block<P extends BlockProps = BlockProps> {
     if (this._element) {
       this._element.style.display = 'none';
     }
+  }
+
+  protected mountComponent(
+    containerSelector: string,
+    childKey: keyof typeof this.children,
+  ): void {
+    const container = this.element?.querySelector(containerSelector);
+    const child = this.children[childKey];
+    const content = child?.getContent();
+
+    if (container && content) {
+      container.appendChild(content);
+      child.dispatchComponentDidMount();
+    }
+  }
+
+  protected mountComponents(
+    containerSelector: string,
+    childKeys: Array<keyof typeof this.children>,
+  ): void {
+    childKeys.forEach((key) => {
+      this.mountComponent(containerSelector, key);
+    });
   }
 }
