@@ -6,7 +6,7 @@ const template = `
 <div class="form__group">
   <label class="form__label" for="{{name}}">{{label}}</label>
   <input
-    class="form__input"
+    class="form__input phone-input__field"
     type="tel"
     id="{{name}}"
     name="{{name}}"
@@ -17,7 +17,7 @@ const template = `
 </div>
 `;
 
-export function formatPhoneNumber(value: string): string {
+function formatPhoneNumber(value: string): string {
   const digits = value.replace(/\D/g, '');
 
   const normalizedDigits = digits.startsWith('8') ? `7${digits.slice(1)}` : digits;
@@ -30,47 +30,43 @@ export function formatPhoneNumber(value: string): string {
   return `+${normalizedDigits[0]} (${normalizedDigits.slice(1, 4)}) ${normalizedDigits.slice(4, 7)}-${normalizedDigits.slice(7, 9)}-${normalizedDigits.slice(9, 11)}`;
 }
 
-export function setupPhoneMask(input: HTMLInputElement): void {
-  const handleInput = (e: Event) => {
-    const target = e.target as HTMLInputElement;
-    const cursorPosition = target.selectionStart || 0;
-    const oldLength = target.value.length;
-
-    const newValue = formatPhoneNumber(target.value);
-    target.value = newValue;
-
-    const newLength = target.value.length;
-    const diff = newLength - oldLength;
-
-    target.setSelectionRange(cursorPosition + diff, cursorPosition + diff);
-  };
-
-  input.addEventListener('input', handleInput);
-
-  const inputElement = input;
-  if (!inputElement.value) {
-    inputElement.value = '+7';
-  }
-}
-
 export class PhoneInput extends Block<PhoneInputProps> {
   constructor(props: PhoneInputProps) {
-    super('div', props);
+    const handleInput = (e: Event) => {
+      const target = e.target as HTMLInputElement;
+      const cursorPosition = target.selectionStart || 0;
+      const oldLength = target.value.length;
+
+      const newValue = formatPhoneNumber(target.value);
+      target.value = newValue;
+
+      const newLength = target.value.length;
+      const diff = newLength - oldLength;
+
+      target.setSelectionRange(cursorPosition + diff, cursorPosition + diff);
+    };
+
+    super('div', {
+      ...props,
+      events: {
+        'input .phone-input__field': handleInput,
+      },
+    });
   }
 
   protected render(): string {
     return Handlebars.compile(template)({
       name: this.props.name,
       label: this.props.label,
-      value: this.props.value || '',
+      value: this.props.value || '+7',
       error: this.props.error || '',
     });
   }
 
   protected componentDidMount(): void {
     const input = this.element?.querySelector('input');
-    if (input) {
-      setupPhoneMask(input as HTMLInputElement);
+    if (input && (!input.value || input.value === '')) {
+      input.value = '+7';
     }
   }
 }

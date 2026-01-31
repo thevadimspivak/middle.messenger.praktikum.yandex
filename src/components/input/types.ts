@@ -1,4 +1,6 @@
-export interface InputProps {
+import { BlockProps } from '../../core';
+
+export interface InputProps extends BlockProps {
   name: string;
   label: string;
   type?: string;

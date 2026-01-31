@@ -1,22 +1,24 @@
 import { validateField } from './validation';
 
-function showError(
+type ErrorHandler = (
   input: HTMLInputElement,
   errorElement: HTMLSpanElement,
-  message: string,
-): void {
+  message?: string
+) => void;
+
+const showError: ErrorHandler = (input, errorElement, message = '') => {
   input.classList.add('form__input--error');
   const element = errorElement;
   element.textContent = message;
   element.style.display = 'block';
-}
+};
 
-function hideError(input: HTMLInputElement, errorElement: HTMLSpanElement): void {
+const hideError: ErrorHandler = (input, errorElement) => {
   input.classList.remove('form__input--error');
   const element = errorElement;
   element.textContent = '';
   element.style.display = 'none';
-}
+};
 
 export function setupFormValidation(form: HTMLFormElement): void {
   const inputs = form.querySelectorAll<HTMLInputElement>('.form__input');
