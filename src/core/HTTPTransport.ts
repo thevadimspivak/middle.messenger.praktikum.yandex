@@ -33,27 +33,31 @@ export class HTTPTransport {
     url,
     { ...options, method: METHODS.GET },
     options.timeout,
-  ) as Promise<any>;
+  );
 
   post: HTTPMethodFunc = (url, options = {}) => this.request(
     url,
     { ...options, method: METHODS.POST },
     options.timeout,
-  ) as Promise<any>;
+  );
 
   put: HTTPMethodFunc = (url, options = {}) => this.request(
     url,
     { ...options, method: METHODS.PUT },
     options.timeout,
-  ) as Promise<any>;
+  );
 
   delete: HTTPMethodFunc = (url, options = {}) => this.request(
     url,
     { ...options, method: METHODS.DELETE },
     options.timeout,
-  ) as Promise<any>;
+  );
 
-  request(url: string, options: Options = {}, timeout = 5000): Promise<XMLHttpRequest> {
+  request<R = XMLHttpRequest>(
+    url: string,
+    options: Options = {},
+    timeout = 5000,
+  ): Promise<R> {
     const { headers = {}, method, data } = options;
 
     return new Promise((resolve, reject) => {
@@ -74,7 +78,7 @@ export class HTTPTransport {
         xhr.setRequestHeader(key, headers[key]);
       });
 
-      xhr.onload = () => resolve(xhr);
+      xhr.onload = () => resolve(xhr as R);
       xhr.onabort = () => reject(new Error('Request aborted'));
       xhr.onerror = () => reject(new Error('Request failed'));
 
