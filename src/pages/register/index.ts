@@ -3,8 +3,7 @@ import {
   Input, Button, PhoneInput,
 } from '../../components';
 import { Block } from '../../core';
-import { render } from '../../utils';
-import { getFormValues, setupFormValidation } from '../../utils';
+import { render, getFormValues, setupFormValidation } from '../../utils';
 
 const template = `
 <main class="page">
