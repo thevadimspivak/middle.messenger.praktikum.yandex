@@ -1,5 +1,6 @@
-import Handlebars from 'handlebars';
 import '../../styles/main.scss';
+import { Block } from '../../core';
+import { render } from '../../utils';
 
 const template = `
 <main class="error-page">
@@ -9,13 +10,17 @@ const template = `
 </main>
 `;
 
-function Error404Page(): string {
-  return Handlebars.compile(template)({});
+class Error404Page extends Block {
+  constructor() {
+    super('div');
+  }
+
+  protected render(): string {
+    return template;
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  const app = document.getElementById('app');
-  if (app) {
-    app.innerHTML = Error404Page();
-  }
+  const page = new Error404Page();
+  render('#app', page);
 });
