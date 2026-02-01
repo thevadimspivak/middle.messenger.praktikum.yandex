@@ -1,7 +1,9 @@
 import '../../styles/main.scss';
 import { Avatar, Input, Button } from '../../components';
 import { Block } from '../../core';
-import { render, getFormValues, setupFormValidation, validatePasswordMatch } from '../../utils';
+import {
+  render, getFormValues, setupFormValidation, validatePasswordMatch,
+} from '../../utils';
 
 const template = `
 <main class="profile">
