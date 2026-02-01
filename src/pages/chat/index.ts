@@ -1,7 +1,8 @@
 import Handlebars from 'handlebars';
 import '../../styles/main.scss';
 import { Avatar } from '../../components';
-import { getFormValues, validateField } from '../../utils';
+import { Block } from '../../core';
+import { render, getFormValues, validateField } from '../../utils';
 
 const template = `
 <main class="chat">
@@ -68,60 +69,65 @@ const template = `
 </main>
 `;
 
-function ChatPage(): string {
-  const chats = [
-    {
+class ChatPage extends Block {
+  constructor() {
+    const handleSubmit = (event: Event) => {
+      event.preventDefault();
+      const form = event.target as HTMLFormElement;
+      const messageInput = form.querySelector('[name="message"]') as HTMLInputElement;
+
+      const error = validateField('message', messageInput.value);
+      if (error) {
+        return;
+      }
+
+      const formData = getFormValues(form);
+      console.log('Chat message form data:', formData);
+
+      form.reset();
+    };
+
+    super('div', {
+      events: {
+        'submit .chat__form': handleSubmit,
+      },
+    });
+  }
+
+  protected render(): string {
+    const chats = [
+      {
+        avatar: new Avatar({ size: 'small' }).getContent()?.outerHTML || '',
+        name: 'Unknown',
+        lastMessage: '???',
+        time: '04:08',
+        unread: 0,
+        active: true,
+      },
+    ];
+
+    const selectedChat = {
       avatar: new Avatar({ size: 'small' }).getContent()?.outerHTML || '',
       name: 'Unknown',
-      lastMessage: '???',
-      time: '04:08',
-      unread: 0,
-      active: true,
-    },
-  ];
+      messages: [
+        {
+          text: 'See you in another life brotha',
+          time: '15:16',
+          isMine: false,
+        },
+        {
+          text: '???',
+          time: '23:42',
+          isMine: true,
+        },
+      ],
+    };
 
-  const selectedChat = {
-    avatar: new Avatar({ size: 'small' }).getContent()?.outerHTML || '',
-    name: 'Unknown',
-    messages: [
-      {
-        text: 'See you in another life brotha',
-        time: '15:16',
-        isMine: false,
-      },
-      {
-        text: '???',
-        time: '23:42',
-        isMine: true,
-      },
-    ],
-  };
-
-  return Handlebars.compile(template)({ chats, selectedChat });
+    return Handlebars.compile(template)({ chats, selectedChat });
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  const app = document.getElementById('app');
-  if (app) {
-    app.innerHTML = ChatPage();
-
-    const form = app.querySelector('.chat__form') as HTMLFormElement;
-    if (form) {
-      const messageInput = form.querySelector('[name="message"]') as HTMLInputElement;
-
-      form.addEventListener('submit', (event) => {
-        event.preventDefault();
-
-        const error = validateField('message', messageInput.value);
-        if (error) {
-          return;
-        }
-
-        const formData = getFormValues(form);
-        console.log('Chat message form data:', formData);
-
-        form.reset();
-      });
-    }
-  }
+  const page = new ChatPage();
+  render('#app', page);
 });
