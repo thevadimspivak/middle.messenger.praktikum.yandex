@@ -3,7 +3,7 @@ import {
   Input, Button, PhoneInput,
 } from '../../components';
 import { Block } from '../../core';
-import { render, getFormValues, setupFormValidation } from '../../utils';
+import { render, getFormValues } from '../../utils';
 
 const template = `
 <main class="page">
@@ -109,11 +109,6 @@ class RegisterPage extends Block {
         actionsContainer.insertBefore(buttonContent, actionsContainer.firstChild);
         this.children.submitButton.dispatchComponentDidMount();
       }
-    }
-
-    const form = this.element?.querySelector('.form') as HTMLFormElement;
-    if (form) {
-      setupFormValidation(form);
     }
   }
 }

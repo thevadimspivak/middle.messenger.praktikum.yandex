@@ -6,5 +6,4 @@ export {
 } from './validation';
 export type { ValidationRule, ValidationRules } from './validation';
 
-export { setupFormValidation } from './formValidation';
 export { render } from './render';
