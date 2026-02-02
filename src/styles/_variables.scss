@@ -9,9 +9,25 @@ $color-white: #252525;
 $color-link: #5b9bd5;
 $color-danger: #e74c3c;
 
-$font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+// Chat colors
+$color-chat-active: #2a3a4a;
+$color-chat-active-hover: #354555;
 
+// Message bubbles
+$color-message-incoming: #2b2b2b;
+$color-message-outgoing: #3a5a7a;
+$color-message-text-incoming: #e8e8e8;
+$color-message-text-outgoing: #e8e8e8;
+$font-family: 'Inter', -apple-system, blinkmacsystemfont, 'Segoe UI', roboto, sans-serif;
+
+// Border radius
 $border-radius: 12px;
 $border-radius-small: 8px;
+$border-radius-round: 50%;
+$border-radius-pill: 20px;
 
-$shadow-card: 0 2px 12px rgba(0, 0, 0, 0.3);
+// Sizes
+$sidebar-width: 320px;
+$avatar-size: 130px;
+$avatar-size-small: 47px;
+$shadow-card: 0 2px 12px rgb(0 0 0 / 30%);

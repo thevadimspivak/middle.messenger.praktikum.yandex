@@ -1,9 +1,9 @@
 @use 'variables' as *;
 
 .avatar {
-  width: 130px;
-  height: 130px;
-  border-radius: 50%;
+  width: $avatar-size;
+  height: $avatar-size;
+  border-radius: $border-radius-round;
   background-color: #3a4a5a;
   display: flex;
   align-items: center;
@@ -14,6 +14,11 @@
 
   &:hover {
     opacity: 0.9;
+  }
+
+  &--small {
+    width: $avatar-size-small;
+    height: $avatar-size-small;
   }
 
   &__image {
