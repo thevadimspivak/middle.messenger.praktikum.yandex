@@ -2,7 +2,7 @@ import '../../styles/main.scss';
 import { Avatar, Input, Button } from '../../components';
 import { Block } from '../../core';
 import {
-  render, getFormValues, setupFormValidation, validatePasswordMatch,
+  render, getFormValues, validatePasswordMatch,
 } from '../../utils';
 
 const template = `
@@ -112,11 +112,6 @@ class ProfilePasswordPage extends Block {
     ]);
 
     this.mountComponent('.profile-form__actions', 'submitButton');
-
-    const form = this.element?.querySelector('.profile-form') as HTMLFormElement;
-    if (form) {
-      setupFormValidation(form);
-    }
   }
 }
 

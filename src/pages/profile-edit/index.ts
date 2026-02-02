@@ -3,7 +3,7 @@ import {
   Avatar, Input, Button, PhoneInput,
 } from '../../components';
 import { Block } from '../../core';
-import { render, getFormValues, setupFormValidation } from '../../utils';
+import { render, getFormValues } from '../../utils';
 
 const template = `
 <main class="profile">
@@ -101,11 +101,6 @@ class ProfileEditPage extends Block {
     ]);
 
     this.mountComponent('.profile-form__actions', 'submitButton');
-
-    const form = this.element?.querySelector('.profile-form') as HTMLFormElement;
-    if (form) {
-      setupFormValidation(form);
-    }
   }
 }
 

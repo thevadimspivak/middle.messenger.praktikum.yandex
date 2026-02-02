@@ -1,18 +1,13 @@
 import '../../styles/main.scss';
-import { Input, Button } from '../../components';
+import { Input, Button, Form } from '../../components';
 import { Block } from '../../core';
-import { render, getFormValues, setupFormValidation } from '../../utils';
+import { render } from '../../utils';
 
 const template = `
 <main class="page">
   <div class="card">
     <h1 class="card__title">Sign In</h1>
-    <form class="form">
-      <div class="form__inputs"></div>
-      <div class="form__actions">
-        <a href="/register.html">Create account</a>
-      </div>
-    </form>
+    <div class="card__form"></div>
   </div>
 </main>
 `;
@@ -39,20 +34,18 @@ class LoginPage extends Block {
       text: 'Sign in',
     });
 
-    const handleSubmit = (event: Event) => {
-      event.preventDefault();
-      const form = event.target as HTMLFormElement;
-      const formData = getFormValues(form);
-      console.log('Login form data:', formData);
-    };
-
-    super('div', {
+    const loginForm = new Form({
+      className: 'form',
       loginInput,
       passwordInput,
       submitButton,
-      events: {
-        'submit .form': handleSubmit,
+      onSubmit: (formData) => {
+        console.log('Login form data:', formData);
       },
+    });
+
+    super('div', {
+      loginForm,
     });
   }
 
@@ -61,23 +54,14 @@ class LoginPage extends Block {
   }
 
   protected componentDidMount(): void {
-    this.mountComponents('.form__inputs', [
-      'loginInput',
-      'passwordInput',
-    ]);
-
-    const actionsContainer = this.element?.querySelector('.form__actions');
-    if (actionsContainer && this.children.submitButton) {
-      const buttonContent = this.children.submitButton.getContent();
-      if (buttonContent) {
-        actionsContainer.insertBefore(buttonContent, actionsContainer.firstChild);
-        this.children.submitButton.dispatchComponentDidMount();
-      }
-    }
-
-    const form = this.element?.querySelector('.form') as HTMLFormElement;
-    if (form) {
-      setupFormValidation(form);
+    this.mountComponent('.card__form', 'loginForm');
+    
+    const formElement = (this.children.loginForm as any).getFormElement();
+    if (formElement) {
+      const linkContainer = document.createElement('div');
+      linkContainer.className = 'form__actions';
+      linkContainer.innerHTML = '<a href="/register.html">Create account</a>';
+      formElement.appendChild(linkContainer);
     }
   }
 }
