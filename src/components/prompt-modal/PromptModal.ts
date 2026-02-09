@@ -60,7 +60,7 @@ export class PromptModal extends BaseModal<PromptModalProps> {
   handleSubmit() {
     const input = this.element?.querySelector('.modal__input') as HTMLInputElement;
     const value = input?.value ? trim(input.value) : '';
-    
+
     if (value && this.props.onSubmit) {
       this.props.onSubmit(value);
       this.close();

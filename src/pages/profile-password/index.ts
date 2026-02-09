@@ -6,7 +6,6 @@ import {
 import { UserController } from '../../controllers';
 import router from '../../router';
 
-
 const template = `
 <main class="profile">
   <aside class="profile__sidebar">
@@ -123,7 +122,7 @@ class ProfilePasswordPage extends Block {
     ]);
 
     this.mountComponent('.profile-form__actions', 'submitButton');
-    
+
     if (!UserController.getUser()) {
       UserController.fetchUser();
     } else {
