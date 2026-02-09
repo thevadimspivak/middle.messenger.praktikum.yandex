@@ -1,6 +1,10 @@
 import { BlockProps } from '../../core';
 
-export interface FormProps extends BlockProps {
-  onSubmit?: (formData: Record<string, string>) => void;
+export interface FormProps<T = Record<string, string>> extends BlockProps {
+  onSubmit?: (formData: T) => void;
   className?: string;
+}
+
+export interface Validatable {
+  validate?: () => string | null;
 }

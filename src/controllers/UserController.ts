@@ -1,6 +1,7 @@
 import AuthAPI from '../api/AuthAPI';
 import UserAPI from '../api/UserAPI';
 import store from '../core/Store';
+import type { UpdateProfileData, PasswordData } from '../api/types';
 
 class UserController {
   async fetchUser() {
@@ -18,7 +19,7 @@ class UserController {
     return store.getState().user;
   }
 
-  async updateProfile(data: any) {
+  async updateProfile(data: UpdateProfileData) {
     const user = await UserAPI.updateProfile(data);
     store.set('user', user);
     return user;
@@ -30,7 +31,7 @@ class UserController {
     return user;
   }
 
-  async updatePassword(data: { oldPassword: string; newPassword: string }) {
+  async updatePassword(data: PasswordData) {
     await UserAPI.updatePassword(data);
   }
 }

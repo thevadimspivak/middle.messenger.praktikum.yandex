@@ -1,11 +1,12 @@
 import { Block } from '../../core';
 import { handleLinkClick } from '../../utils';
+import { Routes } from '../../router';
 
 const template = `
 <main class="error-page">
   <h1 class="error-page__code">500</h1>
   <p class="error-page__message">Something went wrong</p>
-  <a href="/messenger" class="error-page__link">Back to chats</a>
+  <a href="${Routes.Messenger}" class="error-page__link">Back to chats</a>
 </main>
 `;
 

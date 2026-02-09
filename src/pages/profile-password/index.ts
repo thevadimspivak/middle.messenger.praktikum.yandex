@@ -1,15 +1,17 @@
 import { Avatar, Input, Button } from '../../components';
-import { Block } from '../../core';
+import { Block, BlockProps } from '../../core';
 import {
   getFormValues, validatePasswordMatch, handleLinkClick, showModal, getUserAvatarUrl, connect,
 } from '../../utils';
+import { getErrorMessage } from '../../utils/errorHandler';
 import { UserController } from '../../controllers';
-import router from '../../router';
+import router, { Routes } from '../../router';
+import type { User } from '../../api/types';
 
 const template = `
 <main class="profile">
   <aside class="profile__sidebar">
-    <a href="/settings" class="profile__back">←</a>
+    <a href="${Routes.Settings}" class="profile__back">←</a>
   </aside>
   <div class="profile__content">
     <div class="profile__avatar"></div>
@@ -21,7 +23,11 @@ const template = `
 </main>
 `;
 
-class ProfilePasswordPage extends Block {
+interface ProfilePasswordPageProps extends BlockProps {
+  user?: User | null;
+}
+
+class ProfilePasswordPage extends Block<ProfilePasswordPageProps> {
   constructor() {
     const avatar = new Avatar();
 
@@ -77,9 +83,9 @@ class ProfilePasswordPage extends Block {
           oldPassword: formData.oldPassword,
           newPassword: formData.newPassword,
         });
-        router.go('/settings');
-      } catch (error: any) {
-        showModal(error.message, 'Error');
+        router.go(Routes.Settings);
+      } catch (error: unknown) {
+        showModal(getErrorMessage(error), 'Error');
       }
     };
 
@@ -128,14 +134,14 @@ class ProfilePasswordPage extends Block {
     } else {
       const user = UserController.getUser();
       if (user) {
-        (this.children.avatar as any).setProps({ src: getUserAvatarUrl(user.avatar) });
+        this.getChild<Avatar>('avatar').setProps({ src: getUserAvatarUrl(user.avatar) });
       }
     }
   }
 
-  protected componentDidUpdate(oldProps: any, newProps: any): boolean {
+  protected componentDidUpdate(oldProps: ProfilePasswordPageProps, newProps: ProfilePasswordPageProps): boolean {
     if (oldProps.user !== newProps.user && newProps.user) {
-      (this.children.avatar as any).setProps({ src: getUserAvatarUrl(newProps.user.avatar) });
+      this.getChild<Avatar>('avatar').setProps({ src: getUserAvatarUrl(newProps.user.avatar) });
     }
     return true;
   }

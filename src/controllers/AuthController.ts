@@ -1,19 +1,19 @@
 import AuthAPI, { SignInData, SignUpData } from '../api/AuthAPI';
 import store from '../core/Store';
-import router from '../router';
+import router, { Routes } from '../router';
 
 class AuthController {
   async login(data: SignInData) {
     const response = await AuthAPI.signIn(data);
     await this.fetchUser();
-    router.go('/messenger');
+    router.go(Routes.Messenger);
     return response;
   }
 
   async signup(data: SignUpData) {
     const response = await AuthAPI.signUp(data);
     await this.fetchUser();
-    router.go('/messenger');
+    router.go(Routes.Messenger);
     return response;
   }
 
@@ -26,7 +26,7 @@ class AuthController {
     store.set('chatTokens', {});
     store.set('chatMessages', {});
     store.set('chatUsers', {});
-    router.go('/');
+    router.go(Routes.Login);
   }
 
   async fetchUser() {

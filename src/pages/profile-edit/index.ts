@@ -1,17 +1,19 @@
 import {
   Avatar, Input, Button, PhoneInput,
 } from '../../components';
-import { Block } from '../../core';
+import { Block, BlockProps } from '../../core';
 import {
   getFormValues, handleLinkClick, showModal, getUserAvatarUrl, connect,
 } from '../../utils';
+import { getErrorMessage } from '../../utils/errorHandler';
 import { UserController } from '../../controllers';
-import router from '../../router';
+import router, { Routes } from '../../router';
+import type { User, UpdateProfileFormData } from '../../api/types';
 
 const template = `
 <main class="profile">
   <aside class="profile__sidebar">
-    <a href="/settings" class="profile__back">←</a>
+    <a href="${Routes.Settings}" class="profile__back">←</a>
   </aside>
   <div class="profile__content">
     <div class="profile__avatar">
@@ -25,7 +27,11 @@ const template = `
 </main>
 `;
 
-class ProfileEditPage extends Block {
+interface ProfileEditPageProps extends BlockProps {
+  user?: User | null;
+}
+
+class ProfileEditPage extends Block<ProfileEditPageProps> {
   constructor() {
     const avatar = new Avatar();
 
@@ -79,13 +85,13 @@ class ProfileEditPage extends Block {
     const handleSubmit = async (event: Event) => {
       event.preventDefault();
       const form = (event.target as HTMLFormElement);
-      const formData = getFormValues(form);
+      const formData = getFormValues<UpdateProfileFormData>(form);
 
       try {
-        await UserController.updateProfile(formData as any);
-        router.go('/settings');
-      } catch (error: any) {
-        showModal(error.message, 'Error');
+        await UserController.updateProfile(formData);
+        router.go(Routes.Settings);
+      } catch (error: unknown) {
+        showModal(getErrorMessage(error), 'Error');
       }
     };
 
@@ -109,8 +115,8 @@ class ProfileEditPage extends Block {
 
       try {
         await UserController.updateAvatar(formData);
-      } catch (error: any) {
-        showModal(error.message, 'Error');
+      } catch (error: unknown) {
+        showModal(getErrorMessage(error), 'Error');
       }
     };
 
@@ -157,22 +163,22 @@ class ProfileEditPage extends Block {
     }
   }
 
-  protected componentDidUpdate(oldProps: any, newProps: any): boolean {
+  protected componentDidUpdate(oldProps: ProfileEditPageProps, newProps: ProfileEditPageProps): boolean {
     if (oldProps.user !== newProps.user && newProps.user) {
       this.updateFromUser(newProps.user);
     }
     return false;
   }
 
-  private updateFromUser(user: any) {
-    (this.children.avatar as any).setProps({ src: getUserAvatarUrl(user.avatar) });
+  private updateFromUser(user: User) {
+    this.getChild<Avatar>('avatar').setProps({ src: getUserAvatarUrl(user.avatar) });
 
-    (this.children.emailInput as any).setProps({ value: user.email });
-    (this.children.loginInput as any).setProps({ value: user.login });
-    (this.children.firstNameInput as any).setProps({ value: user.first_name });
-    (this.children.secondNameInput as any).setProps({ value: user.second_name });
-    (this.children.displayNameInput as any).setProps({ value: user.display_name });
-    (this.children.phoneInput as any).setProps({ value: user.phone });
+    this.getChild<Input>('emailInput').setProps({ value: user.email });
+    this.getChild<Input>('loginInput').setProps({ value: user.login });
+    this.getChild<Input>('firstNameInput').setProps({ value: user.first_name });
+    this.getChild<Input>('secondNameInput').setProps({ value: user.second_name });
+    this.getChild<Input>('displayNameInput').setProps({ value: user.display_name });
+    this.getChild<PhoneInput>('phoneInput').setProps({ value: user.phone });
   }
 }
 

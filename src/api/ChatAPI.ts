@@ -1,59 +1,25 @@
 import { BaseAPI } from './BaseAPI';
+import type {
+  Chat,
+  ChatUser,
+  CreateChatData,
+  AddUsersData,
+  DeleteUsersData,
+  ChatTokenResponse,
+  DeleteChatData,
+  UpdateChatAvatarResponse,
+} from './types';
 
-export interface Chat {
-  id: number;
-  title: string;
-  avatar: string | null;
-  unread_count: number;
-  created_by: number;
-  last_message: {
-    user: {
-      first_name: string;
-      second_name: string;
-      avatar: string;
-      email: string;
-      login: string;
-      phone: string;
-    };
-    time: string;
-    content: string;
-  } | null;
-}
-
-export interface CreateChatData {
-  title: string;
-}
-
-export interface ChatUser {
-  id: number;
-  first_name: string;
-  second_name: string;
-  display_name: string;
-  login: string;
-  avatar: string;
-  role: string;
-}
-
-export interface AddUsersData {
-  users: number[];
-  chatId: number;
-}
-
-export interface DeleteUsersData {
-  users: number[];
-  chatId: number;
-}
-
-export interface DeleteChatData {
-  chatId: number;
-}
-
-export interface UpdateChatAvatarResponse {
-  id: number;
-  title: string;
-  avatar: string;
-  created_by: number;
-}
+export type {
+  Chat,
+  ChatUser,
+  CreateChatData,
+  AddUsersData,
+  DeleteUsersData,
+  ChatTokenResponse,
+  DeleteChatData,
+  UpdateChatAvatarResponse,
+};
 
 class ChatAPIClass extends BaseAPI {
   getChats(): Promise<Chat[]> {
@@ -80,7 +46,7 @@ class ChatAPIClass extends BaseAPI {
     return this.http.delete('/chats/users', { data });
   }
 
-  getChatToken(chatId: number): Promise<{ token: string }> {
+  getChatToken(chatId: number): Promise<ChatTokenResponse> {
     return this.http.post(`/chats/token/${chatId}`);
   }
 

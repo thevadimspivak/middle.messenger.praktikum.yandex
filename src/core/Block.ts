@@ -51,6 +51,10 @@ export class Block<P extends BlockProps = BlockProps> {
     eventBus.emit(Block.EVENTS.INIT);
   }
 
+  protected getChild<T extends Block>(name: string): T {
+    return this.children[name] as T;
+  }
+
   private _getChildren(propsAndChildren: P): { children: Record<string, BlockChild>; props: P } {
     const children: Record<string, BlockChild> = {};
     const props = {} as P;
