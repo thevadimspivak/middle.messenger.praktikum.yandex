@@ -1,16 +1,21 @@
 import Handlebars from 'handlebars';
-import '../../styles/main.scss';
 import { Avatar } from '../../components';
 import { Block, BlockProps } from '../../core';
-import { render } from '../../utils';
+import { handleLinkClick, showModal, getUserAvatarUrl, getUserDisplayName, getUserFields, connect } from '../../utils';
+import UserAPI from '../../api/UserAPI';
+import { UserController, AuthController } from '../../controllers';
+
 
 const template = `
 <main class="profile">
   <aside class="profile__sidebar">
-    <a href="/index.html" class="profile__back">←</a>
+    <a href="/messenger" class="profile__back">←</a>
   </aside>
   <div class="profile__content">
-    <div class="profile__avatar"></div>
+    {{{avatar}}}
+    <div style="display: none;">
+      <input type="file" id="avatarInput" accept="image/*" />
+    </div>
     <h1 class="profile__name">{{displayName}}</h1>
     <div class="profile__info">
       {{#each fields}}
@@ -21,9 +26,9 @@ const template = `
       {{/each}}
     </div>
     <nav class="profile__actions">
-      <a href="/profile-edit.html" class="profile__link">Edit profile</a>
-      <a href="/profile-password.html" class="profile__link">Change password</a>
-      <a href="/login.html" class="profile__link profile__link--danger">Log out</a>
+      <a href="/profile-edit" class="profile__link">Edit profile</a>
+      <a href="/profile-password" class="profile__link">Change password</a>
+      <button class="profile__link profile__link--danger profile__logout">Log out</button>
     </nav>
   </div>
 </main>
@@ -32,43 +37,98 @@ const template = `
 interface ProfilePageProps extends BlockProps {
   displayName?: string;
   fields?: Array<{ label: string; value: string }>;
+  user?: any;
 }
 
 class ProfilePage extends Block<ProfilePageProps> {
-  constructor(props?: ProfilePageProps) {
+  constructor() {
     const avatar = new Avatar();
 
-    const defaultProps = {
-      displayName: 'Ivan',
-      fields: [
-        { label: 'Email', value: 'ivan@mail.com' },
-        { label: 'Login', value: 'ivanivanov' },
-        { label: 'First name', value: 'Ivan' },
-        { label: 'Last name', value: 'Ivanov' },
-        { label: 'Phone', value: '+7 (999) 999-99-99' },
-      ],
-      ...props,
+    const handleLogout = async (e: Event) => {
+      e.preventDefault();
+      try {
+        await AuthController.logout();
+      } catch (error: any) {
+        showModal(error.message, 'Error');
+      }
+    };
+
+    const handleAvatarClick = (e: Event) => {
+      const target = e.target as HTMLElement;
+      if (target.closest('.avatar')) {
+        const input = document.getElementById('avatarInput') as HTMLInputElement;
+        if (input) {
+          input.click();
+        }
+      }
+    };
+
+    const handleAvatarChange = async (e: Event) => {
+      const input = e.target as HTMLInputElement;
+      const file = input.files?.[0];
+      
+      if (!file) {
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('avatar', file);
+
+      try {
+        await UserAPI.updateAvatar(formData);
+        UserController.fetchUser();
+        showModal('Avatar updated successfully', 'Success');
+      } catch (error: any) {
+        showModal(error.message, 'Error');
+      }
     };
 
     super('div', {
       avatar,
-      ...defaultProps,
+      displayName: '',
+      fields: [],
+      events: {
+        'click a': handleLinkClick,
+        'click .profile__logout': handleLogout,
+        'click': handleAvatarClick,
+        'change #avatarInput': handleAvatarChange,
+      },
     });
   }
 
   protected render(): string {
+    const avatarHtml = this.children.avatar ? this.children.avatar.getContent()?.outerHTML || '' : '';
+    
     return Handlebars.compile(template)({
-      displayName: this.props.displayName,
-      fields: this.props.fields,
+      avatar: avatarHtml,
+      displayName: this.props.displayName || '',
+      fields: this.props.fields || [],
     });
   }
 
   protected componentDidMount(): void {
-    this.mountComponent('.profile__avatar', 'avatar');
+    if (!UserController.getUser()) {
+      UserController.fetchUser();
+    } else {
+      this.updateFromUser(UserController.getUser());
+    }
+  }
+
+  protected componentDidUpdate(oldProps: any, newProps: any): boolean {
+    if (oldProps.user !== newProps.user && newProps.user) {
+      this.updateFromUser(newProps.user);
+    }
+    return true;
+  }
+
+  private updateFromUser(user: any) {
+    (this.children.avatar as any).setProps({ src: getUserAvatarUrl(user.avatar) });
+    
+    this.setProps({
+      displayName: getUserDisplayName(user),
+      fields: getUserFields(user),
+    });
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  const page = new ProfilePage();
-  render('#app', page);
-});
+export default connect((state) => ({ user: state.user }))(ProfilePage as any);

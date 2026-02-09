@@ -122,7 +122,9 @@ export class Block<P extends BlockProps = BlockProps> {
       return;
     }
 
-    Object.assign(this.props, nextProps);
+    Object.keys(nextProps).forEach((key) => {
+      this.props[key as keyof P] = nextProps[key as keyof P] as P[keyof P];
+    });
   };
 
   get element(): HTMLElement | null {

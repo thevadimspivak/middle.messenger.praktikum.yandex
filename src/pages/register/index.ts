@@ -1,9 +1,10 @@
-import '../../styles/main.scss';
 import {
   Input, Button, PhoneInput,
 } from '../../components';
 import { Block } from '../../core';
-import { render, getFormValues } from '../../utils';
+import { getFormValues, handleLinkClick, showModal } from '../../utils';
+import { AuthController } from '../../controllers';
+
 
 const template = `
 <main class="page">
@@ -12,14 +13,14 @@ const template = `
     <form class="form">
       <div class="form__inputs"></div>
       <div class="form__actions">
-        <a href="/login.html">Sign in</a>
+        <a href="/">Sign in</a>
       </div>
     </form>
   </div>
 </main>
 `;
 
-class RegisterPage extends Block {
+export class RegisterPage extends Block {
   constructor() {
     const emailInput = new Input({
       name: 'email',
@@ -67,11 +68,16 @@ class RegisterPage extends Block {
       text: 'Register',
     });
 
-    const handleSubmit = (event: Event) => {
+    const handleSubmit = async (event: Event) => {
       event.preventDefault();
       const form = (event.target as HTMLFormElement);
       const formData = getFormValues(form);
-      console.log('Register form data:', formData);
+      
+      try {
+        await AuthController.signup(formData as any);
+      } catch (error: any) {
+        showModal(error.message, 'Registration Error');
+      }
     };
 
     super('div', {
@@ -84,6 +90,7 @@ class RegisterPage extends Block {
       submitButton,
       events: {
         'submit .form': handleSubmit,
+        'click a': handleLinkClick,
       },
     });
   }
@@ -112,8 +119,3 @@ class RegisterPage extends Block {
     }
   }
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-  const page = new RegisterPage();
-  render('#app', page);
-});

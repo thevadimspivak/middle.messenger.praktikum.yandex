@@ -7,14 +7,14 @@
 Развёрнуто по адресу: https://chat-messenger-26.netlify.app/
 
 
-- [Главная / Чаты](https://chat-messenger-26.netlify.app/) - Главная страница со списком чатов
-- [Авторизация](https://chat-messenger-26.netlify.app/login.html) - Страница входа
-- [Регистрация](https://chat-messenger-26.netlify.app/register.html) - Страница регистрации
-- [Профиль](https://chat-messenger-26.netlify.app/profile.html) - Профиль пользователя
-- [Редактирование профиля](https://chat-messenger-26.netlify.app/profile-edit.html) - Изменение данных профиля
-- [Смена пароля](https://chat-messenger-26.netlify.app/profile-password.html) - Изменение пароля
-- [Ошибка 404](https://chat-messenger-26.netlify.app/404.html) - Страница не найдена
-- [Ошибка 500](https://chat-messenger-26.netlify.app/500.html) - Ошибка сервера
+- [Главная / Вход](https://chat-messenger-26.netlify.app/) - Страница входа
+- [Регистрация](https://chat-messenger-26.netlify.app/sign-up) - Страница регистрации
+- [Чаты](https://chat-messenger-26.netlify.app/messenger) - Главная страница со списком чатов
+- [Профиль](https://chat-messenger-26.netlify.app/settings) - Профиль пользователя
+- [Редактирование профиля](https://chat-messenger-26.netlify.app/profile-edit) - Изменение данных профиля
+- [Смена пароля](https://chat-messenger-26.netlify.app/profile-password) - Изменение пароля
+- [Ошибка 404](https://chat-messenger-26.netlify.app/404) - Страница не найдена
+- [Ошибка 500](https://chat-messenger-26.netlify.app/500) - Ошибка сервера
 
 ## Установка и запуск
 
@@ -34,14 +34,14 @@ npm run dev
 
 **Доступные страницы в режиме разработки:**
 
-- [Главная / Чаты](http://localhost:3000/) - Главная страница со списком чатов
-- [Авторизация](http://localhost:3000/login.html) - Страница входа
-- [Регистрация](http://localhost:3000/register.html) - Страница регистрации
-- [Профиль](http://localhost:3000/profile.html) - Профиль пользователя
-- [Редактирование профиля](http://localhost:3000/profile-edit.html) - Изменение данных профиля
-- [Смена пароля](http://localhost:3000/profile-password.html) - Изменение пароля
-- [Ошибка 404](http://localhost:3000/404.html) - Страница не найдена
-- [Ошибка 500](http://localhost:3000/500.html) - Ошибка сервера
+- [Главная / Вход](http://localhost:3000/) - Страница входа
+- [Регистрация](http://localhost:3000/sign-up) - Страница регистрации
+- [Чаты](http://localhost:3000/messenger) - Главная страница со списком чатов
+- [Профиль](http://localhost:3000/settings) - Профиль пользователя
+- [Редактирование профиля](http://localhost:3000/profile-edit) - Изменение данных профиля
+- [Смена пароля](http://localhost:3000/profile-password) - Изменение пароля
+- [Ошибка 404](http://localhost:3000/404) - Страница не найдена
+- [Ошибка 500](http://localhost:3000/500) - Ошибка сервера
 
 ### Сборка проекта
 
