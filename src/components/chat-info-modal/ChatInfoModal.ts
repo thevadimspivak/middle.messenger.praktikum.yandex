@@ -74,11 +74,11 @@ export class ChatInfoModal extends BaseModal<ChatInfoModalProps> {
 
   protected render(): string {
     const usersData = this.props.users.map((user) => {
-      const avatarSrc = user.avatar 
-        ? `${API_CONFIG.BASE_DOMAIN}${API_CONFIG.API_VERSION}/resources${user.avatar}` 
+      const avatarSrc = user.avatar
+        ? `${API_CONFIG.BASE_DOMAIN}${API_CONFIG.API_VERSION}/resources${user.avatar}`
         : '';
       const avatar = new Avatar({ src: avatarSrc, size: 'small' });
-      
+
       return {
         ...user,
         avatar: avatar.getContent()?.outerHTML || '',

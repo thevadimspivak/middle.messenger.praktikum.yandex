@@ -1,10 +1,11 @@
 import Handlebars from 'handlebars';
 import { Avatar } from '../../components';
 import { Block, BlockProps } from '../../core';
-import { handleLinkClick, showModal, getUserAvatarUrl, getUserDisplayName, getUserFields, connect } from '../../utils';
+import {
+  handleLinkClick, showModal, getUserAvatarUrl, getUserDisplayName, getUserFields, connect,
+} from '../../utils';
 import UserAPI from '../../api/UserAPI';
 import { UserController, AuthController } from '../../controllers';
-
 
 const template = `
 <main class="profile">
@@ -66,7 +67,7 @@ class ProfilePage extends Block<ProfilePageProps> {
     const handleAvatarChange = async (e: Event) => {
       const input = e.target as HTMLInputElement;
       const file = input.files?.[0];
-      
+
       if (!file) {
         return;
       }
@@ -90,7 +91,7 @@ class ProfilePage extends Block<ProfilePageProps> {
       events: {
         'click a': handleLinkClick,
         'click .profile__logout': handleLogout,
-        'click': handleAvatarClick,
+        click: handleAvatarClick,
         'change #avatarInput': handleAvatarChange,
       },
     });
@@ -98,7 +99,7 @@ class ProfilePage extends Block<ProfilePageProps> {
 
   protected render(): string {
     const avatarHtml = this.children.avatar ? this.children.avatar.getContent()?.outerHTML || '' : '';
-    
+
     return Handlebars.compile(template)({
       avatar: avatarHtml,
       displayName: this.props.displayName || '',
@@ -123,7 +124,7 @@ class ProfilePage extends Block<ProfilePageProps> {
 
   private updateFromUser(user: any) {
     (this.children.avatar as any).setProps({ src: getUserAvatarUrl(user.avatar) });
-    
+
     this.setProps({
       displayName: getUserDisplayName(user),
       fields: getUserFields(user),

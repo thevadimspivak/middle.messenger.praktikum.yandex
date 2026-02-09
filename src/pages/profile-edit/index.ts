@@ -2,10 +2,11 @@ import {
   Avatar, Input, Button, PhoneInput,
 } from '../../components';
 import { Block } from '../../core';
-import { getFormValues, handleLinkClick, showModal, getUserAvatarUrl, connect } from '../../utils';
+import {
+  getFormValues, handleLinkClick, showModal, getUserAvatarUrl, connect,
+} from '../../utils';
 import { UserController } from '../../controllers';
 import router from '../../router';
-
 
 const template = `
 <main class="profile">
@@ -79,7 +80,7 @@ class ProfileEditPage extends Block {
       event.preventDefault();
       const form = (event.target as HTMLFormElement);
       const formData = getFormValues(form);
-      
+
       try {
         await UserController.updateProfile(formData as any);
         router.go('/settings');
@@ -98,7 +99,7 @@ class ProfileEditPage extends Block {
     const handleAvatarChange = async (e: Event) => {
       const input = e.target as HTMLInputElement;
       const file = input.files?.[0];
-      
+
       if (!file) {
         return;
       }
@@ -148,7 +149,7 @@ class ProfileEditPage extends Block {
     ]);
 
     this.mountComponent('.profile-form__actions', 'submitButton');
-    
+
     if (!UserController.getUser()) {
       UserController.fetchUser();
     } else {
@@ -165,7 +166,7 @@ class ProfileEditPage extends Block {
 
   private updateFromUser(user: any) {
     (this.children.avatar as any).setProps({ src: getUserAvatarUrl(user.avatar) });
-    
+
     (this.children.emailInput as any).setProps({ value: user.email });
     (this.children.loginInput as any).setProps({ value: user.login });
     (this.children.firstNameInput as any).setProps({ value: user.first_name });

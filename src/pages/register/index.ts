@@ -5,7 +5,6 @@ import { Block } from '../../core';
 import { getFormValues, handleLinkClick, showModal } from '../../utils';
 import { AuthController } from '../../controllers';
 
-
 const template = `
 <main class="page">
   <div class="card">
@@ -72,7 +71,7 @@ export class RegisterPage extends Block {
       event.preventDefault();
       const form = (event.target as HTMLFormElement);
       const formData = getFormValues(form);
-      
+
       try {
         await AuthController.signup(formData as any);
       } catch (error: any) {

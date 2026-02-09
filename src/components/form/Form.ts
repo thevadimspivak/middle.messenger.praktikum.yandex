@@ -12,7 +12,7 @@ export class Form extends Block<FormProps> {
   constructor(props: FormProps) {
     const handleSubmit = (event: Event) => {
       event.preventDefault();
-      
+
       let hasErrors = false;
       Object.values(this.children).forEach((child: any) => {
         if (typeof child.validate === 'function') {

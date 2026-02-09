@@ -3,7 +3,6 @@ import { Block } from '../../core';
 import { handleLinkClick, showModal } from '../../utils';
 import { AuthController } from '../../controllers';
 
-
 const template = `
 <main class="page">
   <div class="card">
@@ -63,7 +62,7 @@ export class LoginPage extends Block {
 
   protected componentDidMount(): void {
     this.mountComponent('.card__form', 'loginForm');
-    
+
     const formElement = (this.children.loginForm as any).getFormElement();
     if (formElement) {
       const linkContainer = document.createElement('div');
