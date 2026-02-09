@@ -1,7 +1,8 @@
-import '../../styles/main.scss';
 import { Input, Button, Form } from '../../components';
 import { Block } from '../../core';
-import { render } from '../../utils';
+import { handleLinkClick, showModal } from '../../utils';
+import { AuthController } from '../../controllers';
+
 
 const template = `
 <main class="page">
@@ -12,7 +13,7 @@ const template = `
 </main>
 `;
 
-class LoginPage extends Block {
+export class LoginPage extends Block {
   constructor() {
     const loginInput = new Input({
       name: 'login',
@@ -39,13 +40,20 @@ class LoginPage extends Block {
       loginInput,
       passwordInput,
       submitButton,
-      onSubmit: (formData) => {
-        console.log('Login form data:', formData);
+      onSubmit: async (formData) => {
+        try {
+          await AuthController.login(formData as any);
+        } catch (error: any) {
+          showModal(error.message, 'Authentication Error');
+        }
       },
     });
 
     super('div', {
       loginForm,
+      events: {
+        'click a': handleLinkClick,
+      },
     });
   }
 
@@ -60,13 +68,8 @@ class LoginPage extends Block {
     if (formElement) {
       const linkContainer = document.createElement('div');
       linkContainer.className = 'form__actions';
-      linkContainer.innerHTML = '<a href="/register.html">Create account</a>';
+      linkContainer.innerHTML = '<a href="/sign-up">Create account</a>';
       formElement.appendChild(linkContainer);
     }
   }
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-  const page = new LoginPage();
-  render('#app', page);
-});
