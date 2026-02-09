@@ -1,14 +1,15 @@
-import '../../styles/main.scss';
 import { Avatar, Input, Button } from '../../components';
 import { Block } from '../../core';
 import {
-  render, getFormValues, setupFormValidation, validatePasswordMatch,
+  getFormValues, validatePasswordMatch, handleLinkClick, showModal, getUserAvatarUrl, connect,
 } from '../../utils';
+import { UserController } from '../../controllers';
+import router from '../../router';
 
 const template = `
 <main class="profile">
   <aside class="profile__sidebar">
-    <a href="/profile.html" class="profile__back">←</a>
+    <a href="/settings" class="profile__back">←</a>
   </aside>
   <div class="profile__content">
     <div class="profile__avatar"></div>
@@ -51,7 +52,7 @@ class ProfilePasswordPage extends Block {
       text: 'Save',
     });
 
-    const handleSubmit = (event: Event) => {
+    const handleSubmit = async (event: Event) => {
       event.preventDefault();
       const form = event.target as HTMLFormElement;
       const formData = getFormValues(form);
@@ -71,7 +72,15 @@ class ProfilePasswordPage extends Block {
         return;
       }
 
-      console.log('Change password form data:', formData);
+      try {
+        await UserController.updatePassword({
+          oldPassword: formData.oldPassword,
+          newPassword: formData.newPassword,
+        });
+        router.go('/settings');
+      } catch (error: any) {
+        showModal(error.message, 'Error');
+      }
     };
 
     const handlePasswordInput = () => {
@@ -94,6 +103,7 @@ class ProfilePasswordPage extends Block {
         'submit .profile-form': handleSubmit,
         'input [name="newPassword"]': handlePasswordInput,
         'input [name="newPassword_confirm"]': handlePasswordInput,
+        'click a': handleLinkClick,
       },
     });
   }
@@ -113,14 +123,22 @@ class ProfilePasswordPage extends Block {
 
     this.mountComponent('.profile-form__actions', 'submitButton');
 
-    const form = this.element?.querySelector('.profile-form') as HTMLFormElement;
-    if (form) {
-      setupFormValidation(form);
+    if (!UserController.getUser()) {
+      UserController.fetchUser();
+    } else {
+      const user = UserController.getUser();
+      if (user) {
+        (this.children.avatar as any).setProps({ src: getUserAvatarUrl(user.avatar) });
+      }
     }
+  }
+
+  protected componentDidUpdate(oldProps: any, newProps: any): boolean {
+    if (oldProps.user !== newProps.user && newProps.user) {
+      (this.children.avatar as any).setProps({ src: getUserAvatarUrl(newProps.user.avatar) });
+    }
+    return true;
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  const page = new ProfilePasswordPage();
-  render('#app', page);
-});
+export default connect((state) => ({ user: state.user }))(ProfilePasswordPage as any);

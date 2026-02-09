@@ -1,31 +1,36 @@
 import Handlebars from 'handlebars';
-import '../../styles/main.scss';
-import { Avatar } from '../../components';
-import { Block } from '../../core';
-import { render, getFormValues, validateField } from '../../utils';
+import { Avatar, ChatInfoModal } from '../../components';
+import { Block, BlockProps } from '../../core';
+import {
+  validateField, handleLinkClick, showModal, showPromptModal, trim, connect,
+} from '../../utils';
+import { ChatController } from '../../controllers';
+import UserAPI from '../../api/UserAPI';
+import { API_CONFIG } from '../../config';
 
 const template = `
 <main class="chat">
   <aside class="chat__sidebar">
     <div class="chat__header">
-      <a href="/profile.html" class="chat__profile-link">Profile →</a>
+      <a href="/settings" class="chat__profile-link">Profile →</a>
+      <button class="chat__new-chat-btn">New Chat</button>
     </div>
     <div class="chat__search">
       <input type="text" class="chat__search-input" placeholder="Search" />
     </div>
     <ul class="chat__list">
       {{#each chats}}
-      <li class="chat__item {{#if active}}chat__item--active{{/if}}">
+      <li class="chat__item {{#if active}}chat__item--active{{/if}}" data-chat-id="{{id}}">
         {{{avatar}}}
         <div class="chat__item-info">
           <div class="chat__item-header">
-            <span class="chat__item-name">{{name}}</span>
+            <span class="chat__item-name">{{title}}</span>
             <span class="chat__item-time">{{time}}</span>
           </div>
           <p class="chat__item-message">{{lastMessage}}</p>
         </div>
-        {{#if unread}}
-        <span class="chat__item-badge">{{unread}}</span>
+        {{#if unread_count}}
+        <span class="chat__item-badge">{{unread_count}}</span>
         {{/if}}
       </li>
       {{/each}}
@@ -35,17 +40,22 @@ const template = `
     {{#if selectedChat}}
     <div class="chat__header">
       <div class="chat__user">
-        {{{selectedChat.avatar}}}
-        <span class="chat__user-name">{{selectedChat.name}}</span>
+        <div class="chat__avatar-wrapper" data-chat-id="{{selectedChat.id}}">
+          {{{selectedChat.avatar}}}
+        </div>
+        <span class="chat__user-name">{{selectedChat.title}}</span>
+      </div>
+      <div class="chat__actions">
+        <button class="chat__add-user-btn">Add User</button>
+        <button class="chat__remove-user-btn">Remove User</button>
+        <button class="chat__delete-btn">Delete Chat</button>
       </div>
     </div>
     <div class="chat__messages">
-      {{#each selectedChat.messages}}
-      <div class="message {{#if isMine}}message--mine{{else}}message--other{{/if}}">
-        <div class="message__content">
-          <p class="message__text">{{text}}</p>
-          <span class="message__time">{{time}}</span>
-        </div>
+      {{#each messages}}
+      <div class="chat__message {{#if isOwn}}chat__message--own{{/if}}">
+        <div class="chat__message-content">{{content}}</div>
+        <div class="chat__message-time">{{time}}</div>
       </div>
       {{/each}}
     </div>
@@ -69,9 +79,16 @@ const template = `
 </main>
 `;
 
-class ChatPage extends Block {
+interface ChatPageState extends BlockProps {
+  chats: any[];
+  selectedChat: any | null;
+  messages: any[];
+  user: any;
+}
+
+class ChatPage extends Block<ChatPageState> {
   constructor() {
-    const handleSubmit = (event: Event) => {
+    const handleSubmit = async (event: Event) => {
       event.preventDefault();
       const form = event.target as HTMLFormElement;
       const messageInput = form.querySelector('[name="message"]') as HTMLInputElement;
@@ -81,53 +98,270 @@ class ChatPage extends Block {
         return;
       }
 
-      const formData = getFormValues(form);
-      console.log('Chat message form data:', formData);
+      const message = trim(messageInput.value);
+      if (!message) {
+        return;
+      }
 
-      form.reset();
+      try {
+        ChatController.sendMessage(message);
+        form.reset();
+      } catch (err: any) {
+        showModal(err.message, 'Error');
+      }
+    };
+
+    const handleChatClick = (event: Event) => {
+      const target = event.target as HTMLElement;
+      const chatItem = target.closest('.chat__item') as HTMLElement;
+
+      if (chatItem) {
+        const chatId = parseInt(chatItem.dataset.chatId || '0', 10);
+        this.selectChat(chatId);
+      }
+    };
+
+    const handleNewChat = async () => {
+      showPromptModal('Create New Chat', 'Enter chat name', async (title) => {
+        try {
+          await ChatController.createChat(title);
+          await this.loadChats();
+        } catch (error: any) {
+          showModal(error.message, 'Error');
+        }
+      });
+    };
+
+    const handleDeleteChat = async () => {
+      if (!this.props.selectedChat) return;
+
+      try {
+        await ChatController.deleteChat(this.props.selectedChat.id);
+        this.setProps({ selectedChat: null });
+        await this.loadChats();
+      } catch (error: any) {
+        showModal(error.message, 'Error');
+      }
+    };
+
+    const handleAddUser = async () => {
+      if (!this.props.selectedChat) return;
+
+      showPromptModal('Add User to Chat', 'Enter user login', async (login) => {
+        try {
+          const users = await UserAPI.searchUsers({ login });
+
+          if (users.length === 0) {
+            showModal('User not found', 'Error');
+            return;
+          }
+
+          const user = users[0];
+
+          await ChatController.addUserToChat(this.props.selectedChat.id, user.id);
+
+          showModal(`User ${user.login} added successfully`, 'Success');
+        } catch (error: any) {
+          showModal(error.message, 'Error');
+        }
+      });
+    };
+
+    const handleRemoveUser = async () => {
+      if (!this.props.selectedChat) return;
+
+      showPromptModal('Remove User from Chat', 'Enter user login', async (login) => {
+        try {
+          const users = await UserAPI.searchUsers({ login });
+
+          if (users.length === 0) {
+            showModal('User not found', 'Error');
+            return;
+          }
+
+          const user = users[0];
+
+          await ChatController.removeUserFromChat(this.props.selectedChat.id, user.id);
+
+          showModal(`User ${user.login} removed successfully`, 'Success');
+        } catch (error: any) {
+          showModal(error.message, 'Error');
+        }
+      });
+    };
+
+    const handleAvatarClick = () => {
+      if (!this.props.selectedChat) return;
+
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+
+      input.onchange = async (e: Event) => {
+        const target = e.target as HTMLInputElement;
+        const file = target.files?.[0];
+
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('chatId', this.props.selectedChat.id.toString());
+        formData.append('avatar', file);
+
+        try {
+          await ChatController.updateChatAvatar(this.props.selectedChat.id, formData);
+          await this.loadChats();
+
+          if (this.props.selectedChat) {
+            this.selectChat(this.props.selectedChat.id);
+          }
+        } catch (error: any) {
+          showModal(error.message, 'Error');
+        }
+      };
+
+      input.click();
+    };
+
+    const handleChatTitleClick = async () => {
+      if (!this.props.selectedChat) return;
+
+      try {
+        const users = await ChatController.getChatUsers(this.props.selectedChat.id);
+
+        const modal = new ChatInfoModal({
+          chatTitle: this.props.selectedChat.title,
+          users,
+        });
+
+        const modalElement = modal.getContent();
+        if (modalElement) {
+          document.body.appendChild(modalElement);
+          modal.dispatchComponentDidMount();
+          modal.show();
+        }
+      } catch (error: any) {
+        showModal(error.message, 'Error');
+      }
     };
 
     super('div', {
+      chats: [],
+      selectedChat: null,
+      messages: [],
+      user: null,
       events: {
         'submit .chat__form': handleSubmit,
+        'click a': handleLinkClick,
+        'click .chat__item': handleChatClick,
+        'click .chat__new-chat-btn': handleNewChat,
+        'click .chat__delete-btn': handleDeleteChat,
+        'click .chat__add-user-btn': handleAddUser,
+        'click .chat__remove-user-btn': handleRemoveUser,
+        'click .chat__avatar-wrapper': handleAvatarClick,
+        'click .chat__user-name': handleChatTitleClick,
       },
     });
   }
 
-  protected render(): string {
-    const chats = [
-      {
-        avatar: new Avatar({ size: 'small' }).getContent()?.outerHTML || '',
-        name: 'Unknown',
-        lastMessage: '???',
-        time: '04:08',
-        unread: 0,
-        active: true,
-      },
-    ];
+  async loadChats() {
+    try {
+      const chats = await ChatController.fetchChats();
+      const chatsData = chats.map((chat: any) => {
+        const avatarSrc = chat.avatar ? `${API_CONFIG.BASE_DOMAIN}${API_CONFIG.API_VERSION}/resources${chat.avatar}` : '';
+        const avatar = new Avatar({ src: avatarSrc, size: 'small' });
+
+        return {
+          ...chat,
+          avatarPath: chat.avatar,
+          avatar: avatar.getContent()?.outerHTML || '',
+          time: chat.last_message ? new Date(chat.last_message.time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '',
+          lastMessage: chat.last_message?.content || 'No messages yet',
+          active: chat.id === this.props.selectedChat?.id,
+        };
+      });
+
+      this.setProps({ chats: chatsData });
+    } catch (error: any) {
+      showModal(error.message, 'Error loading chats');
+    }
+  }
+
+  async selectChat(chatId: number) {
+    const chat = this.props.chats.find((c: any) => c.id === chatId);
+    if (!chat) return;
+
+    ChatController.disconnectFromChat();
+
+    const avatarSrc = chat.avatarPath ? `${API_CONFIG.BASE_DOMAIN}${API_CONFIG.API_VERSION}/resources${chat.avatarPath}` : '';
+    const avatar = new Avatar({ src: avatarSrc, size: 'small' });
 
     const selectedChat = {
-      avatar: new Avatar({ size: 'small' }).getContent()?.outerHTML || '',
-      name: 'Unknown',
-      messages: [
-        {
-          text: 'See you in another life brotha',
-          time: '15:16',
-          isMine: false,
-        },
-        {
-          text: '???',
-          time: '23:42',
-          isMine: true,
-        },
-      ],
+      ...chat,
+      avatar: avatar.getContent()?.outerHTML || '',
     };
 
-    return Handlebars.compile(template)({ chats, selectedChat });
+    const chatsData = this.props.chats.map((c: any) => ({
+      ...c,
+      active: c.id === chatId,
+    }));
+
+    ChatController.selectChat(selectedChat);
+
+    try {
+      await ChatController.connectToChat(chatId);
+    } catch (error: any) {
+      console.error('Error connecting to chat:', error);
+    }
+
+    this.setProps({
+      selectedChat,
+      chats: chatsData,
+    });
+  }
+
+  protected render(): string {
+    const compiledTemplate = Handlebars.compile(template);
+    return compiledTemplate(this.props);
+  }
+
+  protected componentDidMount(): void {
+    this.loadChats();
+  }
+
+  protected componentDidUpdate(oldProps: ChatPageState, newProps: ChatPageState): boolean {
+    if (oldProps.messages !== newProps.messages) {
+      this.scrollToBottom();
+    }
+    return true;
+  }
+
+  protected componentWillUnmount(): void {
+    ChatController.disconnectFromChat();
+  }
+
+  private scrollToBottom(): void {
+    const messagesContainer = this.element?.querySelector('.chat__messages');
+    if (messagesContainer) {
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  const page = new ChatPage();
-  render('#app', page);
-});
+const mapStateToProps = (state: any) => {
+  const messages = (state.messages || []).map((msg: any) => {
+    const date = new Date(msg.time);
+    return {
+      ...msg,
+      content: msg.content,
+      time: date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+      isOwn: state.user && msg.user_id === state.user.id.toString(),
+    };
+  });
+
+  return {
+    messages,
+    user: state.user,
+  };
+};
+
+export default connect(mapStateToProps)(ChatPage as any);

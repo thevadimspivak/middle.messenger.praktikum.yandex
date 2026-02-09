@@ -14,14 +14,6 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'static/index.html'),
-        login: resolve(__dirname, 'static/login.html'),
-        register: resolve(__dirname, 'static/register.html'),
-        chat: resolve(__dirname, 'static/chat.html'),
-        profile: resolve(__dirname, 'static/profile.html'),
-        profileEdit: resolve(__dirname, 'static/profile-edit.html'),
-        profilePassword: resolve(__dirname, 'static/profile-password.html'),
-        error404: resolve(__dirname, 'static/404.html'),
-        error500: resolve(__dirname, 'static/500.html'),
       },
     },
   },
