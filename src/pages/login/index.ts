@@ -1,23 +1,21 @@
-import '../../styles/main.scss';
-import { Input, Button } from '../../components';
+import { Input, Button, Form } from '../../components';
 import { Block } from '../../core';
-import { render, getFormValues, setupFormValidation } from '../../utils';
+import { handleLinkClick, showModal } from '../../utils';
+import { getErrorMessage } from '../../utils/errorHandler';
+import { AuthController } from '../../controllers';
+import type { LoginFormData } from '../../api/types';
+import { Routes } from '../../router';
 
 const template = `
 <main class="page">
   <div class="card">
     <h1 class="card__title">Sign In</h1>
-    <form class="form">
-      <div class="form__inputs"></div>
-      <div class="form__actions">
-        <a href="/register.html">Create account</a>
-      </div>
-    </form>
+    <div class="card__form"></div>
   </div>
 </main>
 `;
 
-class LoginPage extends Block {
+export class LoginPage extends Block {
   constructor() {
     const loginInput = new Input({
       name: 'login',
@@ -39,19 +37,24 @@ class LoginPage extends Block {
       text: 'Sign in',
     });
 
-    const handleSubmit = (event: Event) => {
-      event.preventDefault();
-      const form = event.target as HTMLFormElement;
-      const formData = getFormValues(form);
-      console.log('Login form data:', formData);
-    };
-
-    super('div', {
+    const loginForm = new Form<LoginFormData>({
+      className: 'form',
       loginInput,
       passwordInput,
       submitButton,
+      onSubmit: async (formData) => {
+        try {
+          await AuthController.login(formData);
+        } catch (error: unknown) {
+          showModal(getErrorMessage(error), 'Authentication Error');
+        }
+      },
+    });
+
+    super('div', {
+      loginForm,
       events: {
-        'submit .form': handleSubmit,
+        'click a': handleLinkClick,
       },
     });
   }
@@ -61,28 +64,14 @@ class LoginPage extends Block {
   }
 
   protected componentDidMount(): void {
-    this.mountComponents('.form__inputs', [
-      'loginInput',
-      'passwordInput',
-    ]);
+    this.mountComponent('.card__form', 'loginForm');
 
-    const actionsContainer = this.element?.querySelector('.form__actions');
-    if (actionsContainer && this.children.submitButton) {
-      const buttonContent = this.children.submitButton.getContent();
-      if (buttonContent) {
-        actionsContainer.insertBefore(buttonContent, actionsContainer.firstChild);
-        this.children.submitButton.dispatchComponentDidMount();
-      }
-    }
-
-    const form = this.element?.querySelector('.form') as HTMLFormElement;
-    if (form) {
-      setupFormValidation(form);
+    const formElement = this.getChild<Form<LoginFormData>>('loginForm').getFormElement();
+    if (formElement) {
+      const linkContainer = document.createElement('div');
+      linkContainer.className = 'form__actions';
+      linkContainer.innerHTML = `<a href="${Routes.SignUp}">Create account</a>`;
+      formElement.appendChild(linkContainer);
     }
   }
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-  const page = new LoginPage();
-  render('#app', page);
-});

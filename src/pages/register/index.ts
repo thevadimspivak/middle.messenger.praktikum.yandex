@@ -1,9 +1,12 @@
-import '../../styles/main.scss';
 import {
   Input, Button, PhoneInput,
 } from '../../components';
 import { Block } from '../../core';
-import { render, getFormValues, setupFormValidation } from '../../utils';
+import { getFormValues, handleLinkClick, showModal } from '../../utils';
+import { getErrorMessage } from '../../utils/errorHandler';
+import { AuthController } from '../../controllers';
+import type { SignUpFormData } from '../../api/types';
+import { Routes } from '../../router';
 
 const template = `
 <main class="page">
@@ -12,14 +15,14 @@ const template = `
     <form class="form">
       <div class="form__inputs"></div>
       <div class="form__actions">
-        <a href="/login.html">Sign in</a>
+        <a href="${Routes.Login}">Sign in</a>
       </div>
     </form>
   </div>
 </main>
 `;
 
-class RegisterPage extends Block {
+export class RegisterPage extends Block {
   constructor() {
     const emailInput = new Input({
       name: 'email',
@@ -67,11 +70,16 @@ class RegisterPage extends Block {
       text: 'Register',
     });
 
-    const handleSubmit = (event: Event) => {
+    const handleSubmit = async (event: SubmitEvent) => {
       event.preventDefault();
       const form = (event.target as HTMLFormElement);
-      const formData = getFormValues(form);
-      console.log('Register form data:', formData);
+      const formData = getFormValues<SignUpFormData>(form);
+
+      try {
+        await AuthController.signup(formData);
+      } catch (error: unknown) {
+        showModal(getErrorMessage(error), 'Registration Error');
+      }
     };
 
     super('div', {
@@ -84,6 +92,7 @@ class RegisterPage extends Block {
       submitButton,
       events: {
         'submit .form': handleSubmit,
+        'click a': handleLinkClick,
       },
     });
   }
@@ -110,15 +119,5 @@ class RegisterPage extends Block {
         this.children.submitButton.dispatchComponentDidMount();
       }
     }
-
-    const form = this.element?.querySelector('.form') as HTMLFormElement;
-    if (form) {
-      setupFormValidation(form);
-    }
   }
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-  const page = new RegisterPage();
-  render('#app', page);
-});

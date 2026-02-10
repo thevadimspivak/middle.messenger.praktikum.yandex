@@ -1,10 +1,9 @@
-import { Block } from '../core';
+import { Block } from '../core/Block';
 
 export function render(query: string, block: Block): HTMLElement | null {
   const root = document.querySelector(query);
 
   if (!root) {
-    console.error(`Element with selector "${query}" not found`);
     return null;
   }
 

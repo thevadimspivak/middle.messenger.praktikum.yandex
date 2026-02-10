@@ -1,6 +1,7 @@
 import Handlebars from 'handlebars';
 import { Block } from '../../core';
 import type { InputProps } from './types';
+import { validateField } from '../../utils/validation';
 
 const template = `
 <div class="form__group">
@@ -13,13 +14,71 @@ const template = `
     placeholder="{{placeholder}}"
     {{#if value}}value="{{value}}"{{/if}}
   />
-  <span class="form__error">{{error}}</span>
+  <span class="form__error"></span>
 </div>
 `;
 
 export class Input extends Block<InputProps> {
   constructor(props: InputProps) {
-    super('div', props);
+    const handleBlur = (event: Event) => {
+      const input = event.target as HTMLInputElement;
+      const error = validateField(input.name, input.value);
+      this.showError(error || undefined);
+    };
+
+    const handleFocus = () => {
+      this.hideError();
+    };
+
+    super('div', {
+      ...props,
+      events: {
+        'blur .form__input': handleBlur,
+        'focus .form__input': handleFocus,
+        ...props.events,
+      },
+    });
+  }
+
+  private showError(message?: string): void {
+    const errorElement = this.element?.querySelector<HTMLSpanElement>('.form__error');
+    const inputElement = this.element?.querySelector<HTMLInputElement>('.form__input');
+
+    if (message) {
+      inputElement?.classList.add('form__input--error');
+      if (errorElement) {
+        errorElement.textContent = message;
+        errorElement.style.display = 'block';
+      }
+    } else {
+      this.hideError();
+    }
+  }
+
+  private hideError(): void {
+    const errorElement = this.element?.querySelector<HTMLSpanElement>('.form__error');
+    const inputElement = this.element?.querySelector<HTMLInputElement>('.form__input');
+
+    inputElement?.classList.remove('form__input--error');
+    if (errorElement) {
+      errorElement.textContent = '';
+      errorElement.style.display = 'none';
+    }
+  }
+
+  public getValue(): string {
+    const input = this.element?.querySelector<HTMLInputElement>('.form__input');
+    return input?.value || '';
+  }
+
+  public validate(): string | null {
+    const input = this.element?.querySelector<HTMLInputElement>('.form__input');
+    if (!input) return null;
+
+    const error = validateField(input.name, input.value);
+    this.showError(error || undefined);
+
+    return error;
   }
 
   protected render(): string {
@@ -29,7 +88,6 @@ export class Input extends Block<InputProps> {
       type: this.props.type || 'text',
       placeholder: this.props.placeholder || '',
       value: this.props.value || '',
-      error: this.props.error || '',
     });
   }
 }

@@ -40,6 +40,12 @@
 
   &__avatar {
     margin-bottom: 20px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 0.8;
+    }
   }
 
   &__name {
@@ -85,6 +91,32 @@
     display: block;
     padding: 12px 0;
     border-bottom: 1px solid $color-border;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    text-align: left;
+    cursor: pointer;
+    font-size: inherit;
+    font-family: inherit;
+    color: inherit;
+    transition: color 0.2s;
+
+    &:hover {
+      color: $color-primary;
+    }
+
+    &--danger {
+      color: #d32f2f;
+
+      &:hover {
+        color: #b71c1c;
+      }
+    }
+  }
+
+  &__logout {
+    width: 100%;
   }
 }
 
