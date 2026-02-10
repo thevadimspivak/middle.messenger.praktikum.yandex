@@ -4,8 +4,12 @@ import { Block } from '../core/Block';
 
 type Indexed = Record<string, any>;
 
-export function connect(mapStateToProps: (state: Indexed) => Indexed) {
-  return function wrap(Component: typeof Block) {
+type BlockConstructor = new (...args: any[]) => Block;
+
+export function connect<T extends BlockConstructor>(
+  mapStateToProps: (state: Indexed) => Indexed,
+) {
+  return function wrap(Component: T): T {
     return class extends Component {
       constructor(...args: any[]) {
         let state = mapStateToProps(store.getState());
@@ -28,6 +32,6 @@ export function connect(mapStateToProps: (state: Indexed) => Indexed) {
           state = newState;
         });
       }
-    };
+    } as T;
   };
 }

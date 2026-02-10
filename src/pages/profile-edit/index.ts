@@ -82,7 +82,7 @@ class ProfileEditPage extends Block<ProfileEditPageProps> {
       text: 'Save',
     });
 
-    const handleSubmit = async (event: Event) => {
+    const handleSubmit = async (event: SubmitEvent) => {
       event.preventDefault();
       const form = (event.target as HTMLFormElement);
       const formData = getFormValues<UpdateProfileFormData>(form);
@@ -163,7 +163,10 @@ class ProfileEditPage extends Block<ProfileEditPageProps> {
     }
   }
 
-  protected componentDidUpdate(oldProps: ProfileEditPageProps, newProps: ProfileEditPageProps): boolean {
+  protected componentDidUpdate(
+    oldProps: ProfileEditPageProps,
+    newProps: ProfileEditPageProps,
+  ): boolean {
     if (oldProps.user !== newProps.user && newProps.user) {
       this.updateFromUser(newProps.user);
     }
@@ -182,4 +185,4 @@ class ProfileEditPage extends Block<ProfileEditPageProps> {
   }
 }
 
-export default connect((state) => ({ user: state.user }))(ProfileEditPage as any);
+export default connect((state) => ({ user: state.user }))(ProfileEditPage);

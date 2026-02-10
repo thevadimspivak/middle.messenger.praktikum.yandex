@@ -70,7 +70,7 @@ export class RegisterPage extends Block {
       text: 'Register',
     });
 
-    const handleSubmit = async (event: Event) => {
+    const handleSubmit = async (event: SubmitEvent) => {
       event.preventDefault();
       const form = (event.target as HTMLFormElement);
       const formData = getFormValues<SignUpFormData>(form);

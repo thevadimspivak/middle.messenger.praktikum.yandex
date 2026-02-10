@@ -48,7 +48,7 @@ class ProfilePage extends Block<ProfilePageProps> {
   constructor() {
     const avatar = new Avatar();
 
-    const handleLogout = async (e: Event) => {
+    const handleLogout = async (e: MouseEvent) => {
       e.preventDefault();
       try {
         await AuthController.logout();
@@ -57,7 +57,7 @@ class ProfilePage extends Block<ProfilePageProps> {
       }
     };
 
-    const handleAvatarClick = (e: Event) => {
+    const handleAvatarClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       if (target.closest('.avatar')) {
         const input = document.getElementById('avatarInput') as HTMLInputElement;
@@ -135,4 +135,4 @@ class ProfilePage extends Block<ProfilePageProps> {
   }
 }
 
-export default connect((state) => ({ user: state.user }))(ProfilePage as any);
+export default connect((state) => ({ user: state.user }))(ProfilePage);

@@ -58,7 +58,7 @@ class ProfilePasswordPage extends Block<ProfilePasswordPageProps> {
       text: 'Save',
     });
 
-    const handleSubmit = async (event: Event) => {
+    const handleSubmit = async (event: SubmitEvent) => {
       event.preventDefault();
       const form = event.target as HTMLFormElement;
       const formData = getFormValues(form);
@@ -69,8 +69,8 @@ class ProfilePasswordPage extends Block<ProfilePasswordPageProps> {
       );
 
       if (passwordMatchError) {
-        const confirmInput = form.querySelector('[name="newPassword_confirm"]') as HTMLInputElement;
-        const errorSpan = confirmInput?.parentElement?.querySelector('.form__error') as HTMLElement;
+        const confirmInput = form.querySelector<HTMLInputElement>('[name="newPassword_confirm"]');
+        const errorSpan = confirmInput?.parentElement?.querySelector<HTMLElement>('.form__error');
         if (errorSpan) {
           errorSpan.textContent = passwordMatchError;
           errorSpan.style.display = 'block';
@@ -90,9 +90,9 @@ class ProfilePasswordPage extends Block<ProfilePasswordPageProps> {
     };
 
     const handlePasswordInput = () => {
-      const form = this.element?.querySelector('.profile-form') as HTMLFormElement;
-      const confirmInput = form?.querySelector('[name="newPassword_confirm"]') as HTMLInputElement;
-      const errorSpan = confirmInput?.parentElement?.querySelector('.form__error') as HTMLElement;
+      const form = this.element?.querySelector<HTMLFormElement>('.profile-form');
+      const confirmInput = form?.querySelector<HTMLInputElement>('[name="newPassword_confirm"]');
+      const errorSpan = confirmInput?.parentElement?.querySelector<HTMLElement>('.form__error');
       if (errorSpan && errorSpan.textContent === 'Passwords do not match') {
         errorSpan.textContent = '';
         errorSpan.style.display = 'none';
@@ -139,7 +139,10 @@ class ProfilePasswordPage extends Block<ProfilePasswordPageProps> {
     }
   }
 
-  protected componentDidUpdate(oldProps: ProfilePasswordPageProps, newProps: ProfilePasswordPageProps): boolean {
+  protected componentDidUpdate(
+    oldProps: ProfilePasswordPageProps,
+    newProps: ProfilePasswordPageProps,
+  ): boolean {
     if (oldProps.user !== newProps.user && newProps.user) {
       this.getChild<Avatar>('avatar').setProps({ src: getUserAvatarUrl(newProps.user.avatar) });
     }
@@ -147,4 +150,4 @@ class ProfilePasswordPage extends Block<ProfilePasswordPageProps> {
   }
 }
 
-export default connect((state) => ({ user: state.user }))(ProfilePasswordPage as any);
+export default connect((state) => ({ user: state.user }))(ProfilePasswordPage);

@@ -91,13 +91,15 @@ interface ChatPageState extends BlockProps {
 
 class ChatPage extends Block<ChatPageState> {
   constructor() {
-    const handleSubmit = async (event: Event) => {
+    const handleSubmit = async (event: SubmitEvent) => {
       event.preventDefault();
       const form = event.target as HTMLFormElement;
-      const messageInput = form.querySelector('[name="message"]') as HTMLInputElement;
+      const messageInput = form.querySelector<HTMLInputElement>('[name="message"]');
 
-      const error = validateField('message', messageInput.value);
-      if (error) {
+      if (!messageInput) return;
+
+      const validationError = validateField('message', messageInput.value);
+      if (validationError) {
         return;
       }
 
@@ -114,7 +116,7 @@ class ChatPage extends Block<ChatPageState> {
       }
     };
 
-    const handleChatClick = (event: Event) => {
+    const handleChatClick = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
       const chatItem = target.closest('.chat__item') as HTMLElement;
 
@@ -373,4 +375,4 @@ const mapStateToProps = (state: Record<string, any>) => {
   };
 };
 
-export default connect(mapStateToProps)(ChatPage as any);
+export default connect(mapStateToProps)(ChatPage);

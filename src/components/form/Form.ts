@@ -10,7 +10,7 @@ const template = `
 
 export class Form<T = Record<string, string>> extends Block<FormProps<T>> {
   constructor(props: FormProps<T>) {
-    const handleSubmit = (event: Event) => {
+    const handleSubmit = (event: SubmitEvent) => {
       event.preventDefault();
 
       let hasErrors = false;

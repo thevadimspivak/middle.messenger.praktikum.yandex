@@ -41,8 +41,8 @@ export class Input extends Block<InputProps> {
   }
 
   private showError(message?: string): void {
-    const errorElement = this.element?.querySelector('.form__error') as HTMLSpanElement;
-    const inputElement = this.element?.querySelector('.form__input') as HTMLInputElement;
+    const errorElement = this.element?.querySelector<HTMLSpanElement>('.form__error');
+    const inputElement = this.element?.querySelector<HTMLInputElement>('.form__input');
 
     if (message) {
       inputElement?.classList.add('form__input--error');
@@ -56,8 +56,8 @@ export class Input extends Block<InputProps> {
   }
 
   private hideError(): void {
-    const errorElement = this.element?.querySelector('.form__error') as HTMLSpanElement;
-    const inputElement = this.element?.querySelector('.form__input') as HTMLInputElement;
+    const errorElement = this.element?.querySelector<HTMLSpanElement>('.form__error');
+    const inputElement = this.element?.querySelector<HTMLInputElement>('.form__input');
 
     inputElement?.classList.remove('form__input--error');
     if (errorElement) {
@@ -67,12 +67,12 @@ export class Input extends Block<InputProps> {
   }
 
   public getValue(): string {
-    const input = this.element?.querySelector('.form__input') as HTMLInputElement;
+    const input = this.element?.querySelector<HTMLInputElement>('.form__input');
     return input?.value || '';
   }
 
   public validate(): string | null {
-    const input = this.element?.querySelector('.form__input') as HTMLInputElement;
+    const input = this.element?.querySelector<HTMLInputElement>('.form__input');
     if (!input) return null;
 
     const error = validateField(input.name, input.value);

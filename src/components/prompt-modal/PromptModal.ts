@@ -46,10 +46,9 @@ export class PromptModal extends BaseModal<PromptModalProps> {
           this.close();
         },
         'click .modal-overlay': overlayCloseHandler,
-        'keydown .modal__input': (e: Event) => {
-          const keyEvent = e as KeyboardEvent;
-          if (keyEvent.key === 'Enter') {
-            keyEvent.preventDefault();
+        'keydown .modal__input': (e: KeyboardEvent) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
             this.handleSubmit();
           }
         },
@@ -58,7 +57,7 @@ export class PromptModal extends BaseModal<PromptModalProps> {
   }
 
   handleSubmit() {
-    const input = this.element?.querySelector('.modal__input') as HTMLInputElement;
+    const input = this.element?.querySelector<HTMLInputElement>('.modal__input');
     const value = input?.value ? trim(input.value) : '';
 
     if (value && this.props.onSubmit) {
@@ -77,7 +76,7 @@ export class PromptModal extends BaseModal<PromptModalProps> {
   show() {
     super.show();
     setTimeout(() => {
-      const input = this.element?.querySelector('.modal__input') as HTMLInputElement;
+      const input = this.element?.querySelector<HTMLInputElement>('.modal__input');
       input?.focus();
     }, 100);
   }
