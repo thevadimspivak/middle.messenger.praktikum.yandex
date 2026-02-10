@@ -69,8 +69,8 @@ export class PhoneInput extends Block<PhoneInputProps> {
   }
 
   private showError(message?: string): void {
-    const errorElement = this.element?.querySelector('.form__error') as HTMLSpanElement;
-    const inputElement = this.element?.querySelector('.phone-input__field') as HTMLInputElement;
+    const errorElement = this.element?.querySelector<HTMLSpanElement>('.form__error');
+    const inputElement = this.element?.querySelector<HTMLInputElement>('.phone-input__field');
 
     if (message) {
       inputElement?.classList.add('form__input--error');
@@ -84,8 +84,8 @@ export class PhoneInput extends Block<PhoneInputProps> {
   }
 
   private hideError(): void {
-    const errorElement = this.element?.querySelector('.form__error') as HTMLSpanElement;
-    const inputElement = this.element?.querySelector('.phone-input__field') as HTMLInputElement;
+    const errorElement = this.element?.querySelector<HTMLSpanElement>('.form__error');
+    const inputElement = this.element?.querySelector<HTMLInputElement>('.phone-input__field');
 
     inputElement?.classList.remove('form__input--error');
     if (errorElement) {
@@ -95,12 +95,12 @@ export class PhoneInput extends Block<PhoneInputProps> {
   }
 
   public getValue(): string {
-    const input = this.element?.querySelector('.phone-input__field') as HTMLInputElement;
+    const input = this.element?.querySelector<HTMLInputElement>('.phone-input__field');
     return input?.value || '';
   }
 
   public validate(): string | null {
-    const input = this.element?.querySelector('.phone-input__field') as HTMLInputElement;
+    const input = this.element?.querySelector<HTMLInputElement>('.phone-input__field');
     if (!input) return null;
 
     const error = validateField(input.name, input.value);

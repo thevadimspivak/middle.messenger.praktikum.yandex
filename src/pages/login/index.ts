@@ -1,7 +1,10 @@
 import { Input, Button, Form } from '../../components';
 import { Block } from '../../core';
 import { handleLinkClick, showModal } from '../../utils';
+import { getErrorMessage } from '../../utils/errorHandler';
 import { AuthController } from '../../controllers';
+import type { LoginFormData } from '../../api/types';
+import { Routes } from '../../router';
 
 const template = `
 <main class="page">
@@ -34,16 +37,16 @@ export class LoginPage extends Block {
       text: 'Sign in',
     });
 
-    const loginForm = new Form({
+    const loginForm = new Form<LoginFormData>({
       className: 'form',
       loginInput,
       passwordInput,
       submitButton,
       onSubmit: async (formData) => {
         try {
-          await AuthController.login(formData as any);
-        } catch (error: any) {
-          showModal(error.message, 'Authentication Error');
+          await AuthController.login(formData);
+        } catch (error: unknown) {
+          showModal(getErrorMessage(error), 'Authentication Error');
         }
       },
     });
@@ -63,11 +66,11 @@ export class LoginPage extends Block {
   protected componentDidMount(): void {
     this.mountComponent('.card__form', 'loginForm');
 
-    const formElement = (this.children.loginForm as any).getFormElement();
+    const formElement = this.getChild<Form<LoginFormData>>('loginForm').getFormElement();
     if (formElement) {
       const linkContainer = document.createElement('div');
       linkContainer.className = 'form__actions';
-      linkContainer.innerHTML = '<a href="/sign-up">Create account</a>';
+      linkContainer.innerHTML = `<a href="${Routes.SignUp}">Create account</a>`;
       formElement.appendChild(linkContainer);
     }
   }

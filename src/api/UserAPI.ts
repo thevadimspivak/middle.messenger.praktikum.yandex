@@ -1,33 +1,11 @@
 import { BaseAPI } from './BaseAPI';
+import type {
+  User, UpdateProfileData, PasswordData, SearchUserData,
+} from './types';
 
-export interface User {
-  id: number;
-  first_name: string;
-  second_name: string;
-  display_name: string;
-  login: string;
-  email: string;
-  phone: string;
-  avatar: string;
-}
-
-export interface UpdateProfileData {
-  first_name: string;
-  second_name: string;
-  display_name: string;
-  login: string;
-  email: string;
-  phone: string;
-}
-
-export interface PasswordData {
-  oldPassword: string;
-  newPassword: string;
-}
-
-export interface SearchUserData {
-  login: string;
-}
+export type {
+  User, UpdateProfileData, PasswordData, SearchUserData,
+};
 
 export class UserAPI extends BaseAPI {
   updateProfile(data: UpdateProfileData): Promise<User> {

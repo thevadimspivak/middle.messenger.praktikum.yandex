@@ -1,6 +1,6 @@
 import router from '../router';
 
-export function handleLinkClick(event: Event): void {
+export function handleLinkClick(event: MouseEvent): void {
   event.preventDefault();
   const target = event.target as HTMLElement;
   const link = target.closest('a');

@@ -1,11 +1,12 @@
 import ChatAPI from '../api/ChatAPI';
 import store from '../core/Store';
 import webSocketService, { WSEvents } from '../core/WebSocketService';
+import type { Chat, Message } from '../api/types';
 
 class ChatController {
   private currentChatId: number | null = null;
 
-  private messageHandler: ((data: any) => void) | null = null;
+  private messageHandler: ((data: Message | Message[]) => void) | null = null;
 
   async fetchChats() {
     try {
@@ -49,7 +50,7 @@ class ChatController {
     store.set('chatUsers', { ...cachedUsers });
   }
 
-  selectChat(chat: any) {
+  selectChat(chat: Chat) {
     store.set('selectedChat', chat);
   }
 
@@ -148,7 +149,7 @@ class ChatController {
 
     this.currentChatId = chatId;
 
-    this.messageHandler = (data: any) => {
+    this.messageHandler = (data: Message | Message[]) => {
       if (Array.isArray(data)) {
         const reversedMessages = data.reverse();
         store.set('messages', reversedMessages);

@@ -3,7 +3,7 @@ import { EventBus } from './EventBus';
 export interface BlockProps {
   // any нужен для index signature, конкретные типы задаются в наследниках
   [key: string]: any;
-  events?: Record<string, (event: Event) => void>;
+  events?: Record<string, (event: any) => void>;
 }
 
 interface BlockChild {
@@ -49,6 +49,10 @@ export class Block<P extends BlockProps = BlockProps> {
 
     this._registerEvents(eventBus);
     eventBus.emit(Block.EVENTS.INIT);
+  }
+
+  protected getChild<T extends Block>(name: string): T {
+    return this.children[name] as T;
   }
 
   private _getChildren(propsAndChildren: P): { children: Record<string, BlockChild>; props: P } {

@@ -4,15 +4,18 @@ import { Block, BlockProps } from '../../core';
 import {
   validateField, handleLinkClick, showModal, showPromptModal, trim, connect,
 } from '../../utils';
+import { getErrorMessage } from '../../utils/errorHandler';
 import { ChatController } from '../../controllers';
 import UserAPI from '../../api/UserAPI';
 import { API_CONFIG } from '../../config';
+import type { Chat, Message, User } from '../../api/types';
+import { Routes } from '../../router';
 
 const template = `
 <main class="chat">
   <aside class="chat__sidebar">
     <div class="chat__header">
-      <a href="/settings" class="chat__profile-link">Profile →</a>
+      <a href="${Routes.Settings}" class="chat__profile-link">Profile →</a>
       <button class="chat__new-chat-btn">New Chat</button>
     </div>
     <div class="chat__search">
@@ -80,21 +83,23 @@ const template = `
 `;
 
 interface ChatPageState extends BlockProps {
-  chats: any[];
-  selectedChat: any | null;
-  messages: any[];
-  user: any;
+  chats: Chat[];
+  selectedChat: Chat | null;
+  messages: Message[];
+  user: User | null;
 }
 
 class ChatPage extends Block<ChatPageState> {
   constructor() {
-    const handleSubmit = async (event: Event) => {
+    const handleSubmit = async (event: SubmitEvent) => {
       event.preventDefault();
       const form = event.target as HTMLFormElement;
-      const messageInput = form.querySelector('[name="message"]') as HTMLInputElement;
+      const messageInput = form.querySelector<HTMLInputElement>('[name="message"]');
 
-      const error = validateField('message', messageInput.value);
-      if (error) {
+      if (!messageInput) return;
+
+      const validationError = validateField('message', messageInput.value);
+      if (validationError) {
         return;
       }
 
@@ -106,12 +111,12 @@ class ChatPage extends Block<ChatPageState> {
       try {
         ChatController.sendMessage(message);
         form.reset();
-      } catch (err: any) {
-        showModal(err.message, 'Error');
+      } catch (error: unknown) {
+        showModal(getErrorMessage(error), 'Error');
       }
     };
 
-    const handleChatClick = (event: Event) => {
+    const handleChatClick = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
       const chatItem = target.closest('.chat__item') as HTMLElement;
 
@@ -126,8 +131,8 @@ class ChatPage extends Block<ChatPageState> {
         try {
           await ChatController.createChat(title);
           await this.loadChats();
-        } catch (error: any) {
-          showModal(error.message, 'Error');
+        } catch (error: unknown) {
+          showModal(getErrorMessage(error), 'Error');
         }
       });
     };
@@ -139,13 +144,15 @@ class ChatPage extends Block<ChatPageState> {
         await ChatController.deleteChat(this.props.selectedChat.id);
         this.setProps({ selectedChat: null });
         await this.loadChats();
-      } catch (error: any) {
-        showModal(error.message, 'Error');
+      } catch (error: unknown) {
+        showModal(getErrorMessage(error), 'Error');
       }
     };
 
     const handleAddUser = async () => {
       if (!this.props.selectedChat) return;
+
+      const selectedChatId = this.props.selectedChat.id;
 
       showPromptModal('Add User to Chat', 'Enter user login', async (login) => {
         try {
@@ -158,17 +165,19 @@ class ChatPage extends Block<ChatPageState> {
 
           const user = users[0];
 
-          await ChatController.addUserToChat(this.props.selectedChat.id, user.id);
+          await ChatController.addUserToChat(selectedChatId, user.id);
 
           showModal(`User ${user.login} added successfully`, 'Success');
-        } catch (error: any) {
-          showModal(error.message, 'Error');
+        } catch (error: unknown) {
+          showModal(getErrorMessage(error), 'Error');
         }
       });
     };
 
     const handleRemoveUser = async () => {
       if (!this.props.selectedChat) return;
+
+      const selectedChatId = this.props.selectedChat.id;
 
       showPromptModal('Remove User from Chat', 'Enter user login', async (login) => {
         try {
@@ -181,17 +190,19 @@ class ChatPage extends Block<ChatPageState> {
 
           const user = users[0];
 
-          await ChatController.removeUserFromChat(this.props.selectedChat.id, user.id);
+          await ChatController.removeUserFromChat(selectedChatId, user.id);
 
           showModal(`User ${user.login} removed successfully`, 'Success');
-        } catch (error: any) {
-          showModal(error.message, 'Error');
+        } catch (error: unknown) {
+          showModal(getErrorMessage(error), 'Error');
         }
       });
     };
 
     const handleAvatarClick = () => {
       if (!this.props.selectedChat) return;
+
+      const selectedChatId = this.props.selectedChat.id;
 
       const input = document.createElement('input');
       input.type = 'file';
@@ -204,18 +215,18 @@ class ChatPage extends Block<ChatPageState> {
         if (!file) return;
 
         const formData = new FormData();
-        formData.append('chatId', this.props.selectedChat.id.toString());
+        formData.append('chatId', selectedChatId.toString());
         formData.append('avatar', file);
 
         try {
-          await ChatController.updateChatAvatar(this.props.selectedChat.id, formData);
+          await ChatController.updateChatAvatar(selectedChatId, formData);
           await this.loadChats();
 
           if (this.props.selectedChat) {
             this.selectChat(this.props.selectedChat.id);
           }
-        } catch (error: any) {
-          showModal(error.message, 'Error');
+        } catch (error: unknown) {
+          showModal(getErrorMessage(error), 'Error');
         }
       };
 
@@ -239,8 +250,8 @@ class ChatPage extends Block<ChatPageState> {
           modal.dispatchComponentDidMount();
           modal.show();
         }
-      } catch (error: any) {
-        showModal(error.message, 'Error');
+      } catch (error: unknown) {
+        showModal(getErrorMessage(error), 'Error');
       }
     };
 
@@ -266,7 +277,7 @@ class ChatPage extends Block<ChatPageState> {
   async loadChats() {
     try {
       const chats = await ChatController.fetchChats();
-      const chatsData = chats.map((chat: any) => {
+      const chatsData = chats.map((chat) => {
         const avatarSrc = chat.avatar ? `${API_CONFIG.BASE_DOMAIN}${API_CONFIG.API_VERSION}/resources${chat.avatar}` : '';
         const avatar = new Avatar({ src: avatarSrc, size: 'small' });
 
@@ -281,13 +292,13 @@ class ChatPage extends Block<ChatPageState> {
       });
 
       this.setProps({ chats: chatsData });
-    } catch (error: any) {
-      showModal(error.message, 'Error loading chats');
+    } catch (error: unknown) {
+      showModal(getErrorMessage(error), 'Error loading chats');
     }
   }
 
   async selectChat(chatId: number) {
-    const chat = this.props.chats.find((c: any) => c.id === chatId);
+    const chat = this.props.chats.find((c) => c.id === chatId);
     if (!chat) return;
 
     ChatController.disconnectFromChat();
@@ -300,7 +311,7 @@ class ChatPage extends Block<ChatPageState> {
       avatar: avatar.getContent()?.outerHTML || '',
     };
 
-    const chatsData = this.props.chats.map((c: any) => ({
+    const chatsData = this.props.chats.map((c) => ({
       ...c,
       active: c.id === chatId,
     }));
@@ -309,8 +320,8 @@ class ChatPage extends Block<ChatPageState> {
 
     try {
       await ChatController.connectToChat(chatId);
-    } catch (error: any) {
-      console.error('Error connecting to chat:', error);
+    } catch (error: unknown) {
+      console.error('Error connecting to chat:', getErrorMessage(error));
     }
 
     this.setProps({
@@ -347,8 +358,8 @@ class ChatPage extends Block<ChatPageState> {
   }
 }
 
-const mapStateToProps = (state: any) => {
-  const messages = (state.messages || []).map((msg: any) => {
+const mapStateToProps = (state: Record<string, any>) => {
+  const messages = (state.messages || []).map((msg: Message) => {
     const date = new Date(msg.time);
     return {
       ...msg,
@@ -364,4 +375,4 @@ const mapStateToProps = (state: any) => {
   };
 };
 
-export default connect(mapStateToProps)(ChatPage as any);
+export default connect(mapStateToProps)(ChatPage);

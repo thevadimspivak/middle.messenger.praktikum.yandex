@@ -1,15 +1,17 @@
 import { Avatar, Input, Button } from '../../components';
-import { Block } from '../../core';
+import { Block, BlockProps } from '../../core';
 import {
   getFormValues, validatePasswordMatch, handleLinkClick, showModal, getUserAvatarUrl, connect,
 } from '../../utils';
+import { getErrorMessage } from '../../utils/errorHandler';
 import { UserController } from '../../controllers';
-import router from '../../router';
+import router, { Routes } from '../../router';
+import type { User } from '../../api/types';
 
 const template = `
 <main class="profile">
   <aside class="profile__sidebar">
-    <a href="/settings" class="profile__back">←</a>
+    <a href="${Routes.Settings}" class="profile__back">←</a>
   </aside>
   <div class="profile__content">
     <div class="profile__avatar"></div>
@@ -21,7 +23,11 @@ const template = `
 </main>
 `;
 
-class ProfilePasswordPage extends Block {
+interface ProfilePasswordPageProps extends BlockProps {
+  user?: User | null;
+}
+
+class ProfilePasswordPage extends Block<ProfilePasswordPageProps> {
   constructor() {
     const avatar = new Avatar();
 
@@ -52,7 +58,7 @@ class ProfilePasswordPage extends Block {
       text: 'Save',
     });
 
-    const handleSubmit = async (event: Event) => {
+    const handleSubmit = async (event: SubmitEvent) => {
       event.preventDefault();
       const form = event.target as HTMLFormElement;
       const formData = getFormValues(form);
@@ -63,8 +69,8 @@ class ProfilePasswordPage extends Block {
       );
 
       if (passwordMatchError) {
-        const confirmInput = form.querySelector('[name="newPassword_confirm"]') as HTMLInputElement;
-        const errorSpan = confirmInput?.parentElement?.querySelector('.form__error') as HTMLElement;
+        const confirmInput = form.querySelector<HTMLInputElement>('[name="newPassword_confirm"]');
+        const errorSpan = confirmInput?.parentElement?.querySelector<HTMLElement>('.form__error');
         if (errorSpan) {
           errorSpan.textContent = passwordMatchError;
           errorSpan.style.display = 'block';
@@ -77,16 +83,16 @@ class ProfilePasswordPage extends Block {
           oldPassword: formData.oldPassword,
           newPassword: formData.newPassword,
         });
-        router.go('/settings');
-      } catch (error: any) {
-        showModal(error.message, 'Error');
+        router.go(Routes.Settings);
+      } catch (error: unknown) {
+        showModal(getErrorMessage(error), 'Error');
       }
     };
 
     const handlePasswordInput = () => {
-      const form = this.element?.querySelector('.profile-form') as HTMLFormElement;
-      const confirmInput = form?.querySelector('[name="newPassword_confirm"]') as HTMLInputElement;
-      const errorSpan = confirmInput?.parentElement?.querySelector('.form__error') as HTMLElement;
+      const form = this.element?.querySelector<HTMLFormElement>('.profile-form');
+      const confirmInput = form?.querySelector<HTMLInputElement>('[name="newPassword_confirm"]');
+      const errorSpan = confirmInput?.parentElement?.querySelector<HTMLElement>('.form__error');
       if (errorSpan && errorSpan.textContent === 'Passwords do not match') {
         errorSpan.textContent = '';
         errorSpan.style.display = 'none';
@@ -128,17 +134,20 @@ class ProfilePasswordPage extends Block {
     } else {
       const user = UserController.getUser();
       if (user) {
-        (this.children.avatar as any).setProps({ src: getUserAvatarUrl(user.avatar) });
+        this.getChild<Avatar>('avatar').setProps({ src: getUserAvatarUrl(user.avatar) });
       }
     }
   }
 
-  protected componentDidUpdate(oldProps: any, newProps: any): boolean {
+  protected componentDidUpdate(
+    oldProps: ProfilePasswordPageProps,
+    newProps: ProfilePasswordPageProps,
+  ): boolean {
     if (oldProps.user !== newProps.user && newProps.user) {
-      (this.children.avatar as any).setProps({ src: getUserAvatarUrl(newProps.user.avatar) });
+      this.getChild<Avatar>('avatar').setProps({ src: getUserAvatarUrl(newProps.user.avatar) });
     }
     return true;
   }
 }
 
-export default connect((state) => ({ user: state.user }))(ProfilePasswordPage as any);
+export default connect((state) => ({ user: state.user }))(ProfilePasswordPage);

@@ -4,13 +4,16 @@ import { Block, BlockProps } from '../../core';
 import {
   handleLinkClick, showModal, getUserAvatarUrl, getUserDisplayName, getUserFields, connect,
 } from '../../utils';
+import { getErrorMessage } from '../../utils/errorHandler';
 import UserAPI from '../../api/UserAPI';
 import { UserController, AuthController } from '../../controllers';
+import type { User } from '../../api/types';
+import { Routes } from '../../router';
 
 const template = `
 <main class="profile">
   <aside class="profile__sidebar">
-    <a href="/messenger" class="profile__back">←</a>
+    <a href="${Routes.Messenger}" class="profile__back">←</a>
   </aside>
   <div class="profile__content">
     {{{avatar}}}
@@ -27,8 +30,8 @@ const template = `
       {{/each}}
     </div>
     <nav class="profile__actions">
-      <a href="/profile-edit" class="profile__link">Edit profile</a>
-      <a href="/profile-password" class="profile__link">Change password</a>
+      <a href="${Routes.ProfileEdit}" class="profile__link">Edit profile</a>
+      <a href="${Routes.ProfilePassword}" class="profile__link">Change password</a>
       <button class="profile__link profile__link--danger profile__logout">Log out</button>
     </nav>
   </div>
@@ -38,23 +41,23 @@ const template = `
 interface ProfilePageProps extends BlockProps {
   displayName?: string;
   fields?: Array<{ label: string; value: string }>;
-  user?: any;
+  user?: User | null;
 }
 
 class ProfilePage extends Block<ProfilePageProps> {
   constructor() {
     const avatar = new Avatar();
 
-    const handleLogout = async (e: Event) => {
+    const handleLogout = async (e: MouseEvent) => {
       e.preventDefault();
       try {
         await AuthController.logout();
-      } catch (error: any) {
-        showModal(error.message, 'Error');
+      } catch (error: unknown) {
+        showModal(getErrorMessage(error), 'Error');
       }
     };
 
-    const handleAvatarClick = (e: Event) => {
+    const handleAvatarClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       if (target.closest('.avatar')) {
         const input = document.getElementById('avatarInput') as HTMLInputElement;
@@ -79,8 +82,8 @@ class ProfilePage extends Block<ProfilePageProps> {
         await UserAPI.updateAvatar(formData);
         UserController.fetchUser();
         showModal('Avatar updated successfully', 'Success');
-      } catch (error: any) {
-        showModal(error.message, 'Error');
+      } catch (error: unknown) {
+        showModal(getErrorMessage(error), 'Error');
       }
     };
 
@@ -115,15 +118,15 @@ class ProfilePage extends Block<ProfilePageProps> {
     }
   }
 
-  protected componentDidUpdate(oldProps: any, newProps: any): boolean {
+  protected componentDidUpdate(oldProps: ProfilePageProps, newProps: ProfilePageProps): boolean {
     if (oldProps.user !== newProps.user && newProps.user) {
       this.updateFromUser(newProps.user);
     }
     return true;
   }
 
-  private updateFromUser(user: any) {
-    (this.children.avatar as any).setProps({ src: getUserAvatarUrl(user.avatar) });
+  private updateFromUser(user: User) {
+    this.getChild<Avatar>('avatar').setProps({ src: getUserAvatarUrl(user.avatar) });
 
     this.setProps({
       displayName: getUserDisplayName(user),
@@ -132,4 +135,4 @@ class ProfilePage extends Block<ProfilePageProps> {
   }
 }
 
-export default connect((state) => ({ user: state.user }))(ProfilePage as any);
+export default connect((state) => ({ user: state.user }))(ProfilePage);

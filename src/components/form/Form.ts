@@ -1,5 +1,5 @@
 import { Block } from '../../core';
-import type { FormProps } from './types';
+import type { FormProps, Validatable } from './types';
 import { getFormValues } from '../../utils';
 
 const template = `
@@ -8,15 +8,15 @@ const template = `
 </form>
 `;
 
-export class Form extends Block<FormProps> {
-  constructor(props: FormProps) {
-    const handleSubmit = (event: Event) => {
+export class Form<T = Record<string, string>> extends Block<FormProps<T>> {
+  constructor(props: FormProps<T>) {
+    const handleSubmit = (event: SubmitEvent) => {
       event.preventDefault();
 
       let hasErrors = false;
-      Object.values(this.children).forEach((child: any) => {
-        if (typeof child.validate === 'function') {
-          const error = child.validate();
+      Object.values(this.children).forEach((child) => {
+        if (typeof (child as Validatable).validate === 'function') {
+          const error = (child as Validatable).validate?.();
           if (error) {
             hasErrors = true;
           }
@@ -28,7 +28,7 @@ export class Form extends Block<FormProps> {
       }
 
       const form = event.target as HTMLFormElement;
-      const formData = getFormValues(form);
+      const formData = getFormValues(form) as T;
 
       if (this.props.onSubmit) {
         this.props.onSubmit(formData);

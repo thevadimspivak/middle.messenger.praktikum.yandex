@@ -1,5 +1,5 @@
 import './styles/main.scss';
-import router from './router';
+import router, { Routes } from './router';
 import { LoginPage } from './pages/login';
 import { RegisterPage } from './pages/register';
 import ChatPage from './pages/chat';
@@ -12,12 +12,12 @@ import { checkAuth } from './utils';
 
 router
   .setAuthCheck(checkAuth)
-  .use('/', LoginPage)
-  .use('/sign-up', RegisterPage)
-  .use('/settings', ProfilePage, { isProtected: true })
-  .use('/messenger', ChatPage, { isProtected: true })
-  .use('/profile-edit', ProfileEditPage, { isProtected: true })
-  .use('/profile-password', ProfilePasswordPage, { isProtected: true })
-  .use('/404', Error404Page)
-  .use('/500', Error500Page)
+  .use(Routes.Login, LoginPage)
+  .use(Routes.SignUp, RegisterPage)
+  .use(Routes.Settings, ProfilePage, { isProtected: true })
+  .use(Routes.Messenger, ChatPage, { isProtected: true })
+  .use(Routes.ProfileEdit, ProfileEditPage, { isProtected: true })
+  .use(Routes.ProfilePassword, ProfilePasswordPage, { isProtected: true })
+  .use(Routes.Error404, Error404Page)
+  .use(Routes.Error500, Error500Page)
   .start();
